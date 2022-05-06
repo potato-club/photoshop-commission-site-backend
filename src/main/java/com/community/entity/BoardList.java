@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @DynamicUpdate
 @Getter @Setter
-public class BoardList {    // 카카오톡 로그인을 구현할 예정이기 때문에 닉네임은 따로 만들지 않음.
+public class BoardList extends BaseTimeEntity {    // 카카오톡 로그인을 구현할 예정이기 때문에 닉네임은 따로 만들지 않음.
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,12 +28,16 @@ public class BoardList {    // 카카오톡 로그인을 구현할 예정이기 
     @Column(name = "board_type")
     private String type;                        // 게시판 카테고리(직접 할당)
 
-    @Column(name = "title")
+    @Column(name = "title", length = 500, nullable = false)
     private String title;                       // 제목
 
     @Lob
-    @Column(name = "contents")
-    private String contents;                    // 의뢰 내용
+    @Column(name = "contents_text", nullable = false)
+    private String contentsText;                    // 의뢰 내용(문자)
+
+    @Lob
+    @Column(name = "contents_picture")
+    private String contentsPicture;                 // 의뢰 내용(사진)
 
     @Column(name = "created_time")
     private LocalDateTime createdTime;          // 만든 날짜 및 시간

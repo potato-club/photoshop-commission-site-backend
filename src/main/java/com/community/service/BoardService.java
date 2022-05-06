@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -39,7 +38,8 @@ public class BoardService {
                 .orElseThrow(() -> new ResourceNotFoundException("Not exist Board Data by id : ["+id+"]"));
         boardList.setType(updatedBoard.getType());
         boardList.setTitle(updatedBoard.getTitle());
-        boardList.setContents(updatedBoard.getContents());
+        boardList.setContentsText(updatedBoard.getContentsText());
+        boardList.setContentsPicture(updatedBoard.getContentsPicture());
         boardList.setUpdatedTime(LocalDateTime.now());
 
         BoardList endUpdatedBoard = boardRepository.save(boardList);
