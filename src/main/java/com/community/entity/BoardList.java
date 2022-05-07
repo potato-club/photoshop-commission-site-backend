@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @DynamicUpdate
 @Getter @Setter
-public class BoardList extends BaseTimeEntity {    // 카카오톡 로그인을 구현할 예정이기 때문에 닉네임은 따로 만들지 않음.
+public class BoardList extends BaseEntity {    // 카카오톡 로그인을 구현할 예정이기 때문에 닉네임은 따로 만들지 않음.
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

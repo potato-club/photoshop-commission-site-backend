@@ -6,7 +6,6 @@ import com.community.controller.config.oauth.OauthTokenResponse;
 import com.community.dto.KakaoUserInfo;
 import com.community.dto.LoginResponse;
 import com.community.entity.User;
-import com.community.entity.UserProfile;
 import com.community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +45,7 @@ public class OauthService {
 
         return LoginResponse.builder()
                 .id(user.getId())
-                .name(user.getUserProfile().getNickname())
+                .name(user.getUserProfile().getNickName())
                 .email(user.getEmail())
                 .imageUrl(user.getUserProfile().getImageUrl())
                 .role(user.getRole())
@@ -82,8 +81,8 @@ public class OauthService {
         return formData;
     }
 
-    private UserProfile getUserProfile(String providerName, OauthTokenResponse tokenResponse,
-                                       ClientRegistration provider) {
+    private User getUserProfile(String providerName, OauthTokenResponse tokenResponse,
+                                ClientRegistration provider) {
         Map<String, Object> userAttributes = getUserAttributes(provider, tokenResponse);
         Oauth2UserInfo oauth2UserInfo = null;
 
@@ -99,7 +98,7 @@ public class OauthService {
         String email = oauth2UserInfo.getEmail();
         String imageUrl = oauth2UserInfo.getImageUrl();
 
-        User userEntity = userRepository.findByEmail(email);
+        User userEntity = (User) userRepository.findByEmail(email);
 
         if (userEntity == null) {
             userEntity = User.createUser(email, nickname, provide, providerId, imageUrl);

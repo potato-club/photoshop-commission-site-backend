@@ -13,7 +13,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @Getter
 @Setter
-public class CommentList {
+public class CommentList extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
