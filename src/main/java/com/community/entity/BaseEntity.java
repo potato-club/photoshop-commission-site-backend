@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @EntityListeners(value = {AuditingEntityListener.class})
 @MappedSuperclass
 @Getter
-public abstract class BaseEntity extends BaseTimeEntity {
+public abstract class BaseEntity {
 
     @CreatedBy          // BaseTimeEntity의 @CreatedDate를 상속받아 사용하기 때문에 @CreatedBy를 사용한다.
     @Column(updatable = false)

@@ -22,7 +22,7 @@ public class UserProfile {
     private Long id;
 
     @Column(nullable = false)
-    private String Nickname;
+    private String nickName;
 
     @OneToOne(mappedBy = "userProfile", fetch = LAZY)
     private User user;

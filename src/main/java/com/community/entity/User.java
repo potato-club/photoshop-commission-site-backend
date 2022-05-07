@@ -1,6 +1,5 @@
 package com.community.entity;
 
-
 import com.nimbusds.oauth2.sdk.Role;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +17,10 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@EntityListeners(BaseTimeEntity.class)
+@EntityListeners(BaseEntity.class)
 @ToString(of = {"id", "email"})
 @Table(name = "member")
-public class User extends BaseTimeEntity {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -39,10 +38,10 @@ public class User extends BaseTimeEntity {
     private Role role;
 
     @Embedded
-    private BaseTimeEntity timeEntity;
+    private BaseEntity timeEntity;
 
     @Builder
-    public User(String email, UserProfile userProfile, Role role, BaseTimeEntity timeEntity){
+    public User(String email, UserProfile userProfile, Role role, BaseEntity timeEntity){
         this.email = email;
         this.userProfile = userProfile;
         this.role = role;

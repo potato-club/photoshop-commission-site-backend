@@ -48,9 +48,8 @@ public class JwtTokenProvider {
 
     public String getPayload(String token){
         try {
-            return Jwts.parserBuilder()
+            return Jwts.parser()
                     .setSigningKey(secretKey)
-                    .build()
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
@@ -63,9 +62,8 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parserBuilder()
+            Jws<Claims> claimsJws = Jwts.parser()
                     .setSigningKey(secretKey)
-                    .build()
                     .parseClaimsJws(token);
             return !claimsJws.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException exception) {
