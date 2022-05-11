@@ -1,15 +1,14 @@
 package com.community.entity;
 
-import com.nimbusds.oauth2.sdk.Role;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.community.constant.Role;
+import lombok.*;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -34,7 +33,11 @@ public class User extends BaseEntity {
     @JoinColumn(name = "user_profile_id")
     private UserProfile userProfile;
 
-    @Enumerated(STRING)
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<BoardList> boardList = new ArrayList<>();
+
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private Role role;
 
     @Embedded
@@ -48,6 +51,7 @@ public class User extends BaseEntity {
         this.timeEntity = timeEntity;
     }
 
+    @Builder
     public static User createUser(String email, String nickname, String provider, String providerId, String imageUrl) {
 
         UserProfile profile = UserProfile.createProfile(nickname, provider, providerId, imageUrl);
@@ -60,5 +64,10 @@ public class User extends BaseEntity {
         user.addUserProfile(profile);
 
         return user;
+    }
+
+    public void addUserProfile(UserProfile userProfile){
+        this.userProfile = userProfile;
+        userProfile.setUser(this);
     }
 }

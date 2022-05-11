@@ -20,17 +20,11 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 @Conditional(ClientsConfiguredCondition.class)
 class OAuth2ClientRegistrationRepositoryConfiguration {
 
-    private final OAuth2ClientProperties properties;
-
-    OAuth2ClientRegistrationRepositoryConfiguration(OAuth2ClientProperties properties) {
-        this.properties = properties;
-    }
-
     @Bean
     @ConditionalOnMissingBean(ClientRegistrationRepository.class)
-    public InMemoryClientRegistrationRepository clientRegistrationRepository() {
+    public InMemoryClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties properties) {
         List<ClientRegistration> registrations = new ArrayList<>(
-                OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(this.properties).values());
+                OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties).values());
         return new InMemoryClientRegistrationRepository(registrations);
     }
 

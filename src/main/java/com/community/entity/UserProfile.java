@@ -1,11 +1,10 @@
 package com.community.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -13,7 +12,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@ToString(of = {"id", "nickname", "imageUrl"})
+@ToString(of = {"id", "nickName", "imageUrl"})
 public class UserProfile {
 
     @Id
@@ -32,9 +31,22 @@ public class UserProfile {
 
     private String imageUrl;
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Builder
+    public UserProfile(String nickname, String provider, String providerId, String imageUrl) {
+        this.nickName = nickname;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.imageUrl = imageUrl;
+    }
+
+    @Builder
     public static UserProfile createProfile(String nickname, String provider, String providerId, String imageUrl) {
-        return UserProfile.builder()
-                .nickName(nickname)
+        return  UserProfile.builder()
+                .nickname(nickname)
                 .imageUrl(imageUrl)
                 .provider(provider)
                 .providerId(providerId)

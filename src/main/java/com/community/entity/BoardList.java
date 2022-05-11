@@ -1,7 +1,7 @@
 package com.community.entity;
 
 import com.community.constant.BoardRequestType;
-import com.community.controller.config.exception.BoardListAccessType;
+import com.community.constant.BoardListAccessType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
@@ -50,4 +50,7 @@ public class BoardList extends BaseEntity {     // 카카오톡 로그인을 구
     @Column(name = "updated_time")
     private LocalDateTime updatedTime;          // 수정된 날짜 및 시간
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
