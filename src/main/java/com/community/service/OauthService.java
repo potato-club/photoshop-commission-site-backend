@@ -3,6 +3,7 @@ package com.community.service;
 import com.community.controller.config.oauth.JwtTokenProvider;
 import com.community.controller.config.oauth.Oauth2UserInfo;
 import com.community.controller.config.oauth.OauthTokenResponse;
+import com.community.dto.CustomResponse;
 import com.community.dto.KakaoUserInfo;
 import com.community.dto.LoginResponse;
 import com.community.entity.User;
@@ -30,9 +31,9 @@ import java.util.Map;
 public class OauthService {
     private static final String BEARER_TYPE = "Bearer";
 
-    private final InMemoryClientRegistrationRepository inMemoryRepository;
-    private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    private InMemoryClientRegistrationRepository inMemoryRepository;
+    private UserRepository userRepository;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public LoginResponse login(String providerName, String code) {
@@ -54,6 +55,13 @@ public class OauthService {
                 .refreshToken(refreshToken)
                 .build();
     }
+
+//    @Transactional
+//    public CustomResponse logout(String accessToken) {
+//        String id = jwtTokenProvider.getPayload(accessToken);
+//        // redisUtil.deleteData(id);
+//        return new CustomResponse("로그아웃이 완료 되었습니다.");
+//    }
 
     private OauthTokenResponse getToken(String code, ClientRegistration provider) {
         return WebClient.create()
@@ -98,7 +106,7 @@ public class OauthService {
         String email = oauth2UserInfo.getEmail();
         String imageUrl = oauth2UserInfo.getImageUrl();
 
-        User userEntity = (User) userRepository.findByEmail(email);
+        User userEntity = userRepository.findByEmail(email);
 
         if (userEntity == null) {
             userEntity = User.createUser(email, nickname, provide, providerId, imageUrl);

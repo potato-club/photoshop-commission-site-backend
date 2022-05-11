@@ -18,16 +18,18 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
 
     @CreatedBy          // BaseTimeEntity의 @CreatedDate를 상속받아 사용하기 때문에 @CreatedBy를 사용한다.
-    @Column(updatable = false)
+    @Column(updatable = false, insertable = false)
     private String createdBy;
 
     @LastModifiedBy     // BaseTimeEntity의 @LastModifiedDate를 상속받아 사용하기 때문에 @LastModifiedBy를 사용한다.
+    @Column(updatable = false, insertable = false)
     private String modifiedBy;
 
     @CreatedDate
-    @Column(updatable = false)
+    @Column(updatable = false, insertable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
+    @Column(updatable = false, insertable = false)
     private String modifiedDate;
 }

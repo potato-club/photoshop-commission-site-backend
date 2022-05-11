@@ -1,6 +1,6 @@
 package com.community.dto;
 
-import com.nimbusds.oauth2.sdk.Role;
+import com.community.constant.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,8 @@ public class LoginResponse {
     private String refreshToken;
 
     @Builder
-    public LoginResponse(Long id, String name, String email, String imageUrl, Role role, String tokenType, String accessToken, String refreshToken) {
+    public LoginResponse(Long id, String name, String email, String imageUrl, Role role, String tokenType,
+                         String accessToken, String refreshToken) {
         this.id = id;
         this.name = name;
         this.email = email;
