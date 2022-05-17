@@ -3,7 +3,6 @@ package com.community.service;
 import com.community.controller.config.oauth.JwtTokenProvider;
 import com.community.controller.config.oauth.Oauth2UserInfo;
 import com.community.controller.config.oauth.OauthTokenResponse;
-import com.community.dto.CustomResponse;
 import com.community.dto.KakaoUserInfo;
 import com.community.dto.LoginResponse;
 import com.community.entity.User;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
@@ -55,13 +53,6 @@ public class OauthService {
                 .refreshToken(refreshToken)
                 .build();
     }
-
-//    @Transactional
-//    public CustomResponse logout(String accessToken) {
-//        String id = jwtTokenProvider.getPayload(accessToken);
-//        // redisUtil.deleteData(id);
-//        return new CustomResponse("로그아웃이 완료 되었습니다.");
-//    }
 
     private OauthTokenResponse getToken(String code, ClientRegistration provider) {
         return WebClient.create()

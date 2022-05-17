@@ -2,7 +2,6 @@ package com.community.controller.config.oauth;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
-
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
