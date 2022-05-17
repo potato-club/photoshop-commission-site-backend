@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -19,20 +20,25 @@ public class BoardService {
     @Autowired
     private BoardRepository boardRepository;
 
-    public Page<BoardList> getAllBoard(Pageable pageable) {  // 저장된 게시글 전부 출력
-        return boardRepository.findAll(pageable);
+    @Transactional
+    public Page<BoardList> getAllBoardType(Pageable pageable, String type) {  // 저장된 게시글 전부 출력
+
+        return boardRepository.findAllByType(pageable, type);
     }
 
+    @Transactional
     public BoardList createBoardList(BoardList boardList) { // 게시글 만들기
         return boardRepository.save(boardList);
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<BoardList> getBoardList(Long id) {
         BoardList boardList = boardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Not exist Board Data by id : ["+id+"]"));
         return ResponseEntity.ok(boardList);
     }
 
+    @Transactional
     public ResponseEntity<BoardList> updateBoardList(Long id, BoardList updatedBoard) {
         BoardList boardList = boardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Not exist Board Data by id : ["+id+"]"));
@@ -46,6 +52,7 @@ public class BoardService {
         return ResponseEntity.ok(endUpdatedBoard);
     }
 
+    @Transactional
     public ResponseEntity<Map<String, Boolean>> deleteBoardList(Long id) {
         BoardList boardList = boardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Not exist Board Data by id : ["+id+"]"));
