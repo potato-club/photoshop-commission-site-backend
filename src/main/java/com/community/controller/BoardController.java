@@ -20,11 +20,31 @@ public class BoardController {
     @Autowired
     private BoardService boardService;
 
-    @GetMapping("/list")
-    public Page<BoardList> getAllBoardList(@PageableDefault(page = 0, size = 10, sort = "id",
-            direction = Sort.Direction.DESC) Pageable pageable) {  // 게시글 전체 조회
+    @GetMapping("/list/Before")
+    public Page<BoardList> getAllBoardListBefore(@PageableDefault(page = 0, size = 8, sort = "id",
+            direction = Sort.Direction.DESC) Pageable pageable) {  // 의뢰 전 게시글 전체 조회
 
-        return boardService.getAllBoard(pageable);
+        String boardType = "BEFORE";
+
+        return boardService.getAllBoardType(pageable, boardType);
+    }
+
+    @GetMapping("/list/Requesting")
+    public Page<BoardList> getAllBoardListRequesting(@PageableDefault(page = 0, size = 8, sort = "id",
+            direction = Sort.Direction.DESC) Pageable pageable) {  // 의뢰 중 게시글 전체 조회
+
+        String boardType = "REQUESTING";
+
+        return boardService.getAllBoardType(pageable, boardType);
+    }
+
+    @GetMapping("/list/Complete")
+    public Page<BoardList> getAllBoardListComplete(@PageableDefault(page = 0, size = 8, sort = "id",
+            direction = Sort.Direction.DESC) Pageable pageable) {  // 의뢰 완료 게시글 전체 조회
+
+        String boardType = "COMPLETE";
+
+        return boardService.getAllBoardType(pageable, boardType);
     }
 
     @PostMapping("/create")

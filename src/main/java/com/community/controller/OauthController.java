@@ -13,23 +13,17 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping
 @RequiredArgsConstructor
 @Slf4j
 public class OauthController {
 
     private final OauthService oauthService;
 
-    @GetMapping("/kakao/{provider}")
+    @GetMapping("/login/kakao/{provider}")
     public ResponseEntity<LoginResponse> login(@PathVariable String provider, @RequestParam String code) {
         LoginResponse loginResponse = oauthService.login(provider, code);
 
         return ResponseEntity.ok().body(loginResponse);
     }
-
-//    @PostMapping("/logout/me")
-//    public CustomResponse logout(HttpServletRequest request) {
-//        String accessToken = AuthorizationExtractor.extract(request);
-//        return oauthService.logout(accessToken);
-//    }
 }
