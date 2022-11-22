@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 public class BoardRequestDto {
 
-    @ApiModelProperty(value="게시글 번호", example = "1", required = true)
+    @ApiModelProperty(value="게시글 번호", example = "1", hidden = true)
     private Long id;
 
     @ApiModelProperty(value="생성 시간", example = "yyyy.MM.dd", hidden = true)

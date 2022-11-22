@@ -67,8 +67,8 @@ public class BoardService {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        Optional<BoardList> boardLists = boardRepository.findById(id);
-        BoardResponseDto boardResponseDto = new BoardResponseDto(boardLists.orElseThrow());
+        BoardList boardLists = boardRepository.findById(id).orElseThrow();
+        BoardResponseDto boardResponseDto = new BoardResponseDto(boardLists);
 
         return boardResponseDto;
     }
