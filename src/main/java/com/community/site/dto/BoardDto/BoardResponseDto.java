@@ -31,7 +31,7 @@ public class BoardResponseDto {
         this.questEnum = boardList.getQuestEnum();
         this.context = boardList.getContext();
         this.comments = boardList.getComments().stream().map(CommentResponseDto::new)
-                .filter(comments -> !comments.getChildren().isEmpty()).collect(Collectors.toList());
+                .filter(comments -> comments.isParent()).collect(Collectors.toList());
         this.image = boardList.getImage().stream().map(FileResponseDto::new).collect(Collectors.toList());
     }
 }

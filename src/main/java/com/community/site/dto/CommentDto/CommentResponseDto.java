@@ -12,6 +12,9 @@ public class CommentResponseDto {
     @ApiModelProperty(value="댓글 번호", example = "1", required = true)
     private Long id;
 
+    @ApiModelProperty(value="댓글 판별용 boolean", example = "true", hidden = true)
+    private boolean parent;
+
     @ApiModelProperty(value="댓글 내용", example = "재밌당", required = true)
     private String comment;
 
@@ -27,12 +30,13 @@ public class CommentResponseDto {
     @ApiModelProperty(value="게시글 번호", example = "1", hidden = true)
     private Long boardListId;
 
-    @ApiModelProperty(value="자식 댓글", example = "1", hidden = true)
+    @ApiModelProperty(value="자식 댓글", example = "자식 댓글", hidden = true)
     private List<CommentResponseDto> children;
 
     /* Entity -> Dto*/
     public CommentResponseDto(Comment comment) {
         this.id = comment.getId();
+        this.parent = comment.isParent();
         this.comment = comment.getComment();
         this.createdDate = comment.getCreatedDate();
         this.modifiedDate = comment.getModifiedDate();
