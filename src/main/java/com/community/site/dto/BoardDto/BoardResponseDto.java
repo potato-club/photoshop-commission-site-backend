@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class BoardResponseDto {
 
     private Long id;
-    private String createDate;
+    private String createdDate;
     private String modifiedDate;
     private String nickname;
     private String title;
@@ -24,7 +24,7 @@ public class BoardResponseDto {
 
     public BoardResponseDto(BoardList boardList) {
         this.id = boardList.getId();
-        this.createDate = boardList.getCreatedDate();
+        this.createdDate = boardList.getCreatedDate();
         this.modifiedDate = boardList.getModifiedDate();
         this.nickname = boardList.getNickname();
         this.title = boardList.getTitle();
