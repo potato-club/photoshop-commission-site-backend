@@ -29,6 +29,9 @@ public class BoardUpdateRequestDto {
     @ApiModelProperty(value="게시글 제목", example = "테스트 제목입니다.", required = true)
     private String title;
 
+    @ApiModelProperty(value="글 공개 상태", example = "PUBLIC", required = true)
+    private boolean imageOpen;
+
     @ApiModelProperty(value="의뢰 상태", example = "BEFORE", required = true)
     private BoardEnumCustom questEnum;
 

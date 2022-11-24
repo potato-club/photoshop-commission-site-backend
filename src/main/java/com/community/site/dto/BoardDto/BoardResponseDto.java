@@ -17,6 +17,7 @@ public class BoardResponseDto {
     private String modifiedDate;
     private String nickname;
     private String title;
+    private boolean imageOpen;
     private BoardEnumCustom questEnum;
     private String context;
     private List<CommentResponseDto> comments;
@@ -28,10 +29,13 @@ public class BoardResponseDto {
         this.modifiedDate = boardList.getModifiedDate();
         this.nickname = boardList.getNickname();
         this.title = boardList.getTitle();
+        this.imageOpen = boardList.isImageOpen();
         this.questEnum = boardList.getQuestEnum();
         this.context = boardList.getContext();
         this.comments = boardList.getComments().stream().map(CommentResponseDto::new)
                 .filter(comments -> comments.isParent()).collect(Collectors.toList());
-        this.image = boardList.getImage().stream().map(FileResponseDto::new).collect(Collectors.toList());
+        if (boardList.isImageOpen() == true) {
+            this.image = boardList.getImage().stream().map(FileResponseDto::new).collect(Collectors.toList());
+        }
     }
 }

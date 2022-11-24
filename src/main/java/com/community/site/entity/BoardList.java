@@ -39,6 +39,9 @@ public class BoardList {
     @Enumerated(EnumType.STRING)
     private BoardEnumCustom questEnum;
 
+    @Column(nullable = false)
+    private boolean imageOpen;
+
     @Column(columnDefinition = "TEXT", nullable = false)
     private String context;
 
@@ -64,6 +67,7 @@ public class BoardList {
     public void update(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.modifiedDate = boardUpdateRequestDto.getModifiedDate();
         this.title = boardUpdateRequestDto.getTitle();
+        this.imageOpen = boardUpdateRequestDto.isImageOpen();
         this.questEnum = boardUpdateRequestDto.getQuestEnum();
         this.context = boardUpdateRequestDto.getContext();
     }

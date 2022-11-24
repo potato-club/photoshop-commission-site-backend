@@ -14,6 +14,7 @@ public class ThumbnailResponseDto {
     private String createdDate;
     private String nickname;
     private String title;
+    private boolean imageOpen;
     private BoardEnumCustom questEnum;
     private List<FileResponseDto> image;
 
@@ -22,7 +23,10 @@ public class ThumbnailResponseDto {
         this.createdDate = boardList.getCreatedDate();
         this.nickname = boardList.getNickname();
         this.title = boardList.getTitle();
+        this.imageOpen = boardList.isImageOpen();
         this.questEnum = boardList.getQuestEnum();
-        this.image = boardList.getImage().stream().map(FileResponseDto::new).limit(1).collect(Collectors.toList());
+        if (boardList.isImageOpen() == true) {
+            this.image = boardList.getImage().stream().map(FileResponseDto::new).limit(1).collect(Collectors.toList());
+        }
     }
 }

@@ -26,7 +26,7 @@ public class TokenController {
     }
 
     @GetMapping("/check/writer")
-    public boolean checkWriter(@RequestBody CheckEnumRequest requestDto, HttpServletRequest request) {
+    public boolean checkWriter(@RequestParam CheckEnumRequest requestDto, HttpServletRequest request) {
         return tokenService.checkWriter(requestDto, request);
     }
 
