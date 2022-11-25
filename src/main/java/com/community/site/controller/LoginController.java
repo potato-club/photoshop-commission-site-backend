@@ -71,9 +71,8 @@ public class LoginController {
     }
 
     @PutMapping("/resolver/token")
-    public String resolverToken(@RequestBody UserMyPageRequestDto requestDto,
-                                HttpServletRequest request, HttpServletResponse response) {
-        return loginService.resolverToken(requestDto, request, response);
+    public String resolverToken(@RequestBody UserMyPageRequestDto requestDto, HttpServletRequest request) {
+        return loginService.resolverToken(requestDto, request);
     }
 
 
