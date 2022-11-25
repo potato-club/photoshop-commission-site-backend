@@ -34,6 +34,7 @@ public class LoginService {
     private final KakaoAPI kakaoAPI;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
+    private final TokenService tokenService;
 
     @Transactional
     public MultiValueMap<String, Object> signUp(UserRequestDto userDto, HttpServletResponse response) {
@@ -125,7 +126,7 @@ public class LoginService {
         }
 
         User user = User.builder()
-                .email("evan34@gmail.com")
+                .email("evan37@gmail.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())
@@ -150,20 +151,18 @@ public class LoginService {
     }
 
     @Transactional
-    public String resolverToken(UserMyPageRequestDto requestDto,
-                                HttpServletRequest request, HttpServletResponse response) {
+    public String resolverToken(UserMyPageRequestDto requestDto, HttpServletRequest request) {
+
         // test code
-        String authorization = jwtTokenProvider.resolveAccessToken(request);
+        String authorization = tokenService.validateAndReissueToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
-        System.out.println(authorization);
-        System.out.println(refreshToken);
+        log.info(authorization);
+        log.info("확인용");
+        log.info(refreshToken);
 
-        boolean a = jwtTokenProvider.validateToken(authorization);
-        System.out.println(a);
-
-        String email = jwtTokenProvider.getUserEmail(refreshToken);
-        System.out.println(email);
+        String email = jwtTokenProvider.getUserEmail(authorization);
+        log.info(email);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });

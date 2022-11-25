@@ -2,6 +2,7 @@ package com.community.site.jwt;
 
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -40,12 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 /// 리프레시 토큰 저장소 존재유무 확인
                 boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
                 if (validateRefreshToken && isRefreshToken) {
-                    /// 리프레시 토큰으로 이메일 정보 가져오기
-                    String email = jwtTokenProvider.getUserEmail(refreshToken);
-                    /// 이메일로 권한정보 받아오기
-                    List<String> roles = jwtTokenProvider.getRoles(email);
                     /// 토큰 발급
-                    String newAccessToken = jwtTokenProvider.createAccessToken(email, roles);
+                    String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
                     /// 헤더에 어세스 토큰 추가
                     jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
                     /// 컨텍스트에 넣기
@@ -56,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new JwtException("다시 로그인 해주세요.");
             }
         }
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response);    // 다음 필터로 넘어가기
     }
 
     // SecurityContext 에 Authentication 객체를 저장합니다.

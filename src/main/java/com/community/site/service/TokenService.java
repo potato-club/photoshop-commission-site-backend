@@ -54,6 +54,27 @@ public class TokenService {
     }
 
     @Transactional
+    public String validateAndReissueToken(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+
+        if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
+            log.info("validationAndReissueToken 확인");
+            boolean validateRefreshToken = jwtTokenProvider.validateToken(refreshToken);
+            boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
+
+            if (validateRefreshToken && isRefreshToken) {
+                String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
+                return newAccessToken;
+            }
+        } else {
+            throw new JwtException("다시 로그인 해주세요.");
+        }
+
+        return accessToken;
+    }
+
+    @Transactional
     public boolean checkWriter(CheckEnumRequest requestDto, HttpServletRequest request) {
         if (request.getHeader("authorization") == null) {
             return false;

@@ -39,7 +39,7 @@ public class BoardList {
     @Enumerated(EnumType.STRING)
     private BoardEnumCustom questEnum;
 
-    @Column(nullable = false)
+    @Column
     private boolean imageOpen;
 
     @Column(columnDefinition = "TEXT", nullable = false)

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Slf4j
@@ -30,10 +31,12 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    // 어세스 토큰 유효시간 | 30m
-    private long accessTokenValidTime = 60 * 30 * 1000L; // 30 * 60 * 1000L;
+    // 액세스 토큰 유효시간 | 1h
+    @Value("${jwt.accessTokenExpiration}")
+    private long accessTokenValidTime;
     // 리프레시 토큰 유효시간 | 7d
-    private long refreshTokenValidTime = 60 * 60 * 24 * 7 * 1000L;
+    @Value("${jwt.refreshTokenExpiration}")
+    private long refreshTokenValidTime;
 
     private final CustomUserDetailService customUserDetailService;
 
@@ -107,10 +110,17 @@ public class JwtTokenProvider {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            log.info(e.getMessage());
-            return false;
+            log.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty: {}", e.getMessage());
         }
+
+        return false;
     }
 
     // 어세스 토큰 헤더 설정
