@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -91,21 +92,24 @@ public class BoardController {
     })
     @PostMapping("/list/create")
     public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
-                                          @ApiIgnore HttpServletRequest request) {
-        return boardService.createBoard(image, boardListDto, request);
+                                          @ApiIgnore HttpServletRequest request,
+                                          @ApiIgnore HttpServletResponse response) {
+        return boardService.createBoard(image, boardListDto, request, response);
     }
 
 
     @PutMapping("/list/update")
     public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto,
-                                          @ApiIgnore HttpServletRequest request) {
-        return boardService.updateBoard(boardListDto, request);
+                                          @ApiIgnore HttpServletRequest request,
+                                          @ApiIgnore HttpServletResponse response) {
+        return boardService.updateBoard(boardListDto, request, response);
     }
 
 
     @DeleteMapping("/list/{id}")
-    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @ApiIgnore HttpServletRequest request) {
-        boardService.deleteBoard(id, request);
+    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @ApiIgnore HttpServletRequest request,
+                                              @ApiIgnore HttpServletResponse response) {
+        boardService.deleteBoard(id, request, response);
         return ResponseEntity.ok("게시글이 삭제되었습니다.");
     }
 

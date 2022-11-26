@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -151,18 +152,14 @@ public class LoginService {
     }
 
     @Transactional
-    public String resolverToken(UserMyPageRequestDto requestDto, HttpServletRequest request) {
+    public String resolverToken(UserMyPageRequestDto requestDto, HttpServletRequest request,
+                                HttpServletResponse response) {
 
         // test code
-        String authorization = tokenService.validateAndReissueToken(request);
+        String authorization = tokenService.validateAndReissueToken(request, response);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
-        log.info(authorization);
-        log.info("확인용");
-        log.info(refreshToken);
-
         String email = jwtTokenProvider.getUserEmail(authorization);
-        log.info(email);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
@@ -174,12 +171,15 @@ public class LoginService {
                 .build();
 
         user.update(updateUser);
+        jwtTokenProvider.setHeaderAccessToken(response, authorization);
+        log.info(response.getHeader("authorization"));
         return "내 정보 업데이트 완료";
     }
 
     @Transactional
-    public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request) {    // 내 정보 업데이트
-        if (!jwtTokenProvider.validateToken(tokenService.validateAndReissueToken(request))) {
+    public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request,
+                             HttpServletResponse response) {    // 내 정보 업데이트
+        if (!jwtTokenProvider.validateToken(tokenService.validateAndReissueToken(request, response))) {
             throw new JwtException("다시 로그인 해주시길 바랍니다.");
         }
 
@@ -193,8 +193,8 @@ public class LoginService {
     }
 
     @Transactional
-    public UserResponseDto viewMyPage(HttpServletRequest request) {     // 내 정보 보기
-        String token = tokenService.validateAndReissueToken(request);
+    public UserResponseDto viewMyPage(HttpServletRequest request, HttpServletResponse response) {     // 내 정보 보기
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -205,8 +205,8 @@ public class LoginService {
     }
 
     @Transactional
-    public void delete(HttpServletRequest request) {    // 회원 탈퇴
-        String token = tokenService.validateAndReissueToken(request);
+    public void delete(HttpServletRequest request, HttpServletResponse response) {    // 회원 탈퇴
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->

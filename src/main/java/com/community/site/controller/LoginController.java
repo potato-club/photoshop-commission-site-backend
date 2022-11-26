@@ -71,14 +71,15 @@ public class LoginController {
     }
 
     @PutMapping("/resolver/token")
-    public String resolverToken(@RequestBody UserMyPageRequestDto requestDto, HttpServletRequest request) {
-        return loginService.resolverToken(requestDto, request);
+    public String resolverToken(@RequestBody UserMyPageRequestDto requestDto, HttpServletRequest request,
+                                HttpServletResponse response) {
+        return loginService.resolverToken(requestDto, request, response);
     }
 
 
     @PutMapping("/mypage")
-    public UserResponseDto viewMyPage(@ApiIgnore HttpServletRequest request) {
-        return loginService.viewMyPage(request);
+    public UserResponseDto viewMyPage(@ApiIgnore HttpServletRequest request, @ApiIgnore HttpServletResponse response) {
+        return loginService.viewMyPage(request, response);
     }
 
 
@@ -88,15 +89,17 @@ public class LoginController {
     })
     @PutMapping("/mypage/update")
     public ResponseEntity<String> updateMyPage(@RequestBody UserMyPageRequestDto userDto,
-                                               @ApiIgnore HttpServletRequest request) {
-        loginService.updateMyPage(userDto, request);
+                                               @ApiIgnore HttpServletRequest request,
+                                               @ApiIgnore HttpServletResponse response) {
+        loginService.updateMyPage(userDto, request, response);
         return ResponseEntity.ok("회원정보가 수정되었습니다.");
     }
 
 
     @DeleteMapping("/mypage/delete")
-    public ResponseEntity<String> deleteUser(@ApiIgnore HttpServletRequest request) {
-        loginService.delete(request);
+    public ResponseEntity<String> deleteUser(@ApiIgnore HttpServletRequest request,
+                                             @ApiIgnore HttpServletResponse response) {
+        loginService.delete(request, response);
         return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
     }
 }

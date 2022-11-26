@@ -1,6 +1,7 @@
 package com.community.site.jwt;
 
-import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -30,30 +30,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 유효한 토큰인지 확인합니다.
         if (accessToken != null) {
-            // 어세스 토큰이 유효한 상황
-            if (jwtTokenProvider.validateToken(accessToken)) {
+            // 액세스 토큰과 리프레시 토큰이 양호한 상황
+            if (jwtTokenProvider.validateToken(accessToken) && jwtTokenProvider.validateToken(refreshToken)) {
                 this.setAuthentication(accessToken);
             }
-            // 어세스 토큰이 만료된 상황 | 리프레시 토큰 또한 존재하는 상황
+            // 액세스 토큰이 만료된 상황 | 리프레시 토큰 또한 존재하는 상황
             else if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
-                // 재발급 후, 컨텍스트에 다시 넣기
-                /// 리프레시 토큰 검증
-                boolean validateRefreshToken = jwtTokenProvider.validateToken(refreshToken);
-                /// 리프레시 토큰 저장소 존재유무 확인
-                boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
-                if (validateRefreshToken && isRefreshToken) {
-                    /// 토큰 발급
-                    String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
-                    /// 헤더에 어세스 토큰 추가
-                    jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
-                    /// 컨텍스트에 넣기
-                    this.setAuthentication(newAccessToken);
-                }
-            }
-            else {
-                throw new JwtException("다시 로그인 해주세요.");
+                log.info("JWT token is expired");
             }
         }
+
         filterChain.doFilter(request, response);    // 다음 필터로 넘어가기
     }
 

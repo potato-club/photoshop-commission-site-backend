@@ -15,8 +15,10 @@ import com.community.site.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,9 +35,10 @@ public class CommentService {
     private final TokenService tokenService;
 
     @Transactional
-    public String createParentComment(Long id, CommentRequestDto commentDto, HttpServletRequest request) {
+    public String createParentComment(Long id, CommentRequestDto commentDto, HttpServletRequest request,
+                                      HttpServletResponse response) {
 
-        String token = tokenService.validateAndReissueToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -51,9 +54,10 @@ public class CommentService {
     }
 
     @Transactional
-    public String createChildComment(CommentRequestDto commentDto, HttpServletRequest request) {
+    public String createChildComment(CommentRequestDto commentDto, HttpServletRequest request,
+                                     HttpServletResponse response) {
 
-        String token = tokenService.validateAndReissueToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -85,9 +89,10 @@ public class CommentService {
     }
 
     @Transactional
-    public void updateComment(CommentUpdateRequestDto commentRequestDto, HttpServletRequest request) {
+    public void updateComment(CommentUpdateRequestDto commentRequestDto, HttpServletRequest request,
+                              HttpServletResponse response) {
 
-        String token = tokenService.validateAndReissueToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -103,9 +108,10 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(CommentDeleteRequestDto requestDto, HttpServletRequest request) {
+    public void deleteComment(CommentDeleteRequestDto requestDto, HttpServletRequest request,
+                              HttpServletResponse response) {
 
-        String token = tokenService.validateAndReissueToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->

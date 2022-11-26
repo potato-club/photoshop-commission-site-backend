@@ -20,8 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -127,9 +129,9 @@ public class BoardService {
 
     @Transactional
     public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
-                                          HttpServletRequest request) {
+                                          HttpServletRequest request, HttpServletResponse response) {
 
-        String token = tokenService.validateAndReissueToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -171,9 +173,10 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, HttpServletRequest request) {
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, HttpServletRequest request,
+                                          HttpServletResponse response) {
 
-        String token = tokenService.validateAndReissueToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -221,9 +224,9 @@ public class BoardService {
     }
 
     @Transactional
-    public void deleteBoard(Long id, HttpServletRequest request) {
+    public void deleteBoard(Long id, HttpServletRequest request, HttpServletResponse response) {
 
-        String token = tokenService.validateAndReissueToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->

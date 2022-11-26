@@ -6,6 +6,7 @@ import com.community.site.error.exception.ForbiddenException;
 import com.community.site.service.Jwt.CustomUserDetailService;
 import com.community.site.service.Jwt.RedisService;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -118,6 +119,8 @@ public class JwtTokenProvider {
             log.error("JWT token is unsupported: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             log.error("JWT claims string is empty: {}", e.getMessage());
+        } catch (SignatureException e) {
+            log.error("JWT signature does not match: {}", e.getMessage());
         }
 
         return false;

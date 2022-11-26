@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static com.community.site.enumcustom.UserRole.GUEST;
 
@@ -26,7 +27,7 @@ public class TokenService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public String validateAndReissueToken(HttpServletRequest request) {
+    public String validateAndReissueToken(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
@@ -37,6 +38,7 @@ public class TokenService {
 
             if (validateRefreshToken && isRefreshToken) {
                 String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
+                jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
                 return newAccessToken;
             }
         } else {
@@ -47,17 +49,12 @@ public class TokenService {
     }
 
     @Transactional
-    public boolean checkWriter(CheckEnumRequest requestDto, HttpServletRequest request) {
+    public boolean checkWriter(CheckEnumRequest requestDto, HttpServletRequest request, HttpServletResponse response) {
         if (request.getHeader("authorization") == null) {
             return false;
         }
 
-        String accessToken = jwtTokenProvider.resolveAccessToken(request);
-        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
-
-        if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
-            throw new JwtException("토큰 재발급 필요!!");
-        }
+        String accessToken = validateAndReissueToken(request, response);
 
         String email = jwtTokenProvider.getUserEmail(accessToken);
         String nickname = boardRepository.getById(requestDto.getId()).getNickname();
@@ -70,17 +67,12 @@ public class TokenService {
     }
 
     @Transactional
-    public UserRole checkEnum(HttpServletRequest request) {
+    public UserRole checkEnum(HttpServletRequest request, HttpServletResponse response) {
         if (request.getHeader("authorization") == null) {
             return GUEST;
         }
 
-        String accessToken = jwtTokenProvider.resolveAccessToken(request);
-        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
-
-        if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
-            throw new JwtException("토큰 재발급 필요!!");
-        }
+        String accessToken = validateAndReissueToken(request, response);
 
         String email = jwtTokenProvider.getUserEmail(accessToken);
         UserRole userEnum = userRepository.getByEmail(email).getUserRole();

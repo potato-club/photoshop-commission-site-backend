@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,12 +22,14 @@ public class TokenController {
     private final TokenService tokenService;
 
     @GetMapping("/check/writer")
-    public boolean checkWriter(@RequestParam CheckEnumRequest requestDto, HttpServletRequest request) {
-        return tokenService.checkWriter(requestDto, request);
+    public boolean checkWriter(@RequestParam CheckEnumRequest requestDto,
+                               @ApiIgnore HttpServletRequest request,
+                               @ApiIgnore HttpServletResponse response) {
+        return tokenService.checkWriter(requestDto, request, response);
     }
 
     @GetMapping("/check/enum")
-    public UserRole checkEnum(HttpServletRequest request) {
-        return tokenService.checkEnum(request);
+    public UserRole checkEnum(@ApiIgnore HttpServletRequest request, @ApiIgnore HttpServletResponse response) {
+        return tokenService.checkEnum(request, response);
     }
 }
