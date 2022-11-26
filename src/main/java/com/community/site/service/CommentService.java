@@ -30,11 +30,12 @@ public class CommentService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
 
     @Transactional
     public String createParentComment(Long id, CommentRequestDto commentDto, HttpServletRequest request) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -52,7 +53,7 @@ public class CommentService {
     @Transactional
     public String createChildComment(CommentRequestDto commentDto, HttpServletRequest request) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -86,7 +87,7 @@ public class CommentService {
     @Transactional
     public void updateComment(CommentUpdateRequestDto commentRequestDto, HttpServletRequest request) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -104,7 +105,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(CommentDeleteRequestDto requestDto, HttpServletRequest request) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->

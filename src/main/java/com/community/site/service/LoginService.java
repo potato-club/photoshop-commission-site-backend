@@ -179,8 +179,8 @@ public class LoginService {
 
     @Transactional
     public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request) {    // 내 정보 업데이트
-        if (!jwtTokenProvider.validateToken(jwtTokenProvider.resolveAccessToken(request))) {
-            throw new JwtException("새로고침 필요!");
+        if (!jwtTokenProvider.validateToken(tokenService.validateAndReissueToken(request))) {
+            throw new JwtException("다시 로그인 해주시길 바랍니다.");
         }
 
         UserRequestDto myDto = UserRequestDto.builder()
@@ -194,7 +194,7 @@ public class LoginService {
 
     @Transactional
     public UserResponseDto viewMyPage(HttpServletRequest request) {     // 내 정보 보기
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -206,7 +206,7 @@ public class LoginService {
 
     @Transactional
     public void delete(HttpServletRequest request) {    // 회원 탈퇴
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->

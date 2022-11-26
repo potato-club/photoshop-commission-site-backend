@@ -59,7 +59,7 @@ public class TokenService {
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
         if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
-            log.info("validationAndReissueToken 확인");
+            log.info("validateAndReissueToken 확인");
             boolean validateRefreshToken = jwtTokenProvider.validateToken(refreshToken);
             boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
 

@@ -42,6 +42,7 @@ public class BoardService {
     private final S3UploadService s3UploadService;
     private final FileRepository fileRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
 
     @Transactional
     public Page<ThumbnailResponseDto> getTitleBoardList(String keyword, int page) {
@@ -128,7 +129,7 @@ public class BoardService {
     public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
                                           HttpServletRequest request) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -172,7 +173,7 @@ public class BoardService {
     @Transactional
     public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, HttpServletRequest request) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -222,7 +223,7 @@ public class BoardService {
     @Transactional
     public void deleteBoard(Long id, HttpServletRequest request) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
