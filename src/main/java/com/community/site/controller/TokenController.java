@@ -20,11 +20,6 @@ public class TokenController {
 
     private final TokenService tokenService;
 
-    @GetMapping("/token/validate")
-    public String validateToken(HttpServletRequest request, HttpServletResponse response) {
-        return tokenService.validateToken(request, response);
-    }
-
     @GetMapping("/check/writer")
     public boolean checkWriter(@RequestParam CheckEnumRequest requestDto, HttpServletRequest request) {
         return tokenService.checkWriter(requestDto, request);
