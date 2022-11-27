@@ -31,12 +31,14 @@ public class TokenService {
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
-        if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
-            log.info("validateAndReissueToken 확인");
-            boolean validateRefreshToken = jwtTokenProvider.validateToken(refreshToken);
-            boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
+        boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
+        boolean checkAccessToken = jwtTokenProvider.validateToken(accessToken);
+        boolean checkRefreshToken = jwtTokenProvider.validateToken(refreshToken);
 
-            if (validateRefreshToken && isRefreshToken) {
+        if (checkAccessToken && checkRefreshToken) {
+            return accessToken;
+        } else if (!checkAccessToken && refreshToken != null) {
+            if (checkRefreshToken && isRefreshToken) {
                 String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
                 jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
                 return newAccessToken;
