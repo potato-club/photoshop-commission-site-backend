@@ -29,7 +29,7 @@ public class BoardUpdateRequestDto {
     @ApiModelProperty(value="게시글 제목", example = "테스트 제목입니다.", required = true)
     private String title;
 
-    @ApiModelProperty(value="글 공개 상태", example = "true", required = true)
+    @ApiModelProperty(value="글 공개 상태", example = "true", hidden = true)
     private boolean imageOpen;
 
     @ApiModelProperty(value="의뢰 상태", example = "BEFORE", required = true)

@@ -91,18 +91,18 @@ public class BoardController {
                     dataType = "List<MultipartFile>", paramType = "query")
     })
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
+    public UploadFileResponse createBoard(List<MultipartFile> image, boolean imageOpen, BoardRequestDto boardListDto,
                                           @ApiIgnore HttpServletRequest request,
                                           @ApiIgnore HttpServletResponse response) {
-        return boardService.createBoard(image, boardListDto, request, response);
+        return boardService.createBoard(image, imageOpen, boardListDto, request, response);
     }
 
 
     @PutMapping("/list/update")
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto,
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, boolean imageOpen,
                                           @ApiIgnore HttpServletRequest request,
                                           @ApiIgnore HttpServletResponse response) {
-        return boardService.updateBoard(boardListDto, request, response);
+        return boardService.updateBoard(boardListDto, imageOpen, request, response);
     }
 
 

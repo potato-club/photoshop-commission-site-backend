@@ -128,8 +128,10 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
-                                          HttpServletRequest request, HttpServletResponse response) {
+    public UploadFileResponse createBoard(List<MultipartFile> image, boolean imageOpen,
+                                          BoardRequestDto boardListDto,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) {
 
         String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
@@ -138,6 +140,7 @@ public class BoardService {
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         boardListDto.setUser(user);
+        boardListDto.setImageOpen(imageOpen);
         boardListDto.setQuestEnum(BEFORE);
 
         BoardList boardList = boardListDto.toEntity();
@@ -173,7 +176,8 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, HttpServletRequest request,
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, boolean imageOpen,
+                                          HttpServletRequest request,
                                           HttpServletResponse response) {
 
         String token = tokenService.validateAndReissueToken(request, response);
@@ -192,6 +196,7 @@ public class BoardService {
         validateDeletedFiles(boardListDto);
         uploadFiles(boardListDto, boardList);
 
+        boardListDto.setImageOpen(imageOpen);
         boardList.update(boardListDto);
 
         List<String> downloadUri = new ArrayList<>();
