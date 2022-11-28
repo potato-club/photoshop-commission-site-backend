@@ -1,6 +1,7 @@
 package com.community.site.controller;
 
 import com.community.site.dto.BoardDto.*;
+import com.community.site.enumcustom.ImageOpen;
 import com.community.site.service.BoardService;
 import com.community.site.service.S3.S3DownloadService;
 import io.swagger.annotations.Api;
@@ -91,7 +92,7 @@ public class BoardController {
                     dataType = "List<MultipartFile>", paramType = "query")
     })
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(List<MultipartFile> image, boolean imageOpen, BoardRequestDto boardListDto,
+    public UploadFileResponse createBoard(List<MultipartFile> image, ImageOpen imageOpen, BoardRequestDto boardListDto,
                                           @ApiIgnore HttpServletRequest request,
                                           @ApiIgnore HttpServletResponse response) {
         return boardService.createBoard(image, imageOpen, boardListDto, request, response);
@@ -99,7 +100,8 @@ public class BoardController {
 
 
     @PutMapping("/list/update")
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, boolean imageOpen,
+
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
                                           @ApiIgnore HttpServletRequest request,
                                           @ApiIgnore HttpServletResponse response) {
         return boardService.updateBoard(boardListDto, imageOpen, request, response);

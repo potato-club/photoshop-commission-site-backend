@@ -5,12 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserRole {
-
-    GUEST("ROLE_GUEST", "손님"),
-    USER("ROLE_USER", "일반 사용자"),
-    ARTIST("ROLE_ARTIST", "아티스트"),
-    ADMINISTRATOR("ROLE_ADMINISTRATOR", "관리자");
+public enum ImageOpen {
+    OPEN("ROLE_OPEN", "공개"),
+    NOT_OPEN("ROLE_NOT_OPEN", "비공개");
 
     private final String key;
     private final String title;

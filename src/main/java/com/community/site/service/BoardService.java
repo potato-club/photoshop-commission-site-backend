@@ -2,6 +2,7 @@ package com.community.site.service;
 
 import com.community.site.dto.BoardDto.*;
 import com.community.site.entity.File;
+import com.community.site.enumcustom.ImageOpen;
 import com.community.site.service.S3.S3UploadService;
 import com.community.site.Repository.BoardRepository;
 import com.community.site.Repository.FileRepository.FileRepository;
@@ -128,7 +129,7 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse createBoard(List<MultipartFile> image, boolean imageOpen,
+    public UploadFileResponse createBoard(List<MultipartFile> image, ImageOpen imageOpen,
                                           BoardRequestDto boardListDto,
                                           HttpServletRequest request,
                                           HttpServletResponse response) {
@@ -176,7 +177,7 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, boolean imageOpen,
+    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
                                           HttpServletRequest request,
                                           HttpServletResponse response) {
 

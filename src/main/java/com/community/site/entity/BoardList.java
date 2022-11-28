@@ -2,6 +2,7 @@ package com.community.site.entity;
 
 import com.community.site.dto.BoardDto.BoardUpdateRequestDto;
 import com.community.site.enumcustom.BoardEnumCustom;
+import com.community.site.enumcustom.ImageOpen;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +41,8 @@ public class BoardList {
     private BoardEnumCustom questEnum;
 
     @Column
-    private boolean imageOpen;
+    @Enumerated(EnumType.STRING)
+    private ImageOpen imageOpen;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String context;
@@ -67,7 +69,7 @@ public class BoardList {
     public void update(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.modifiedDate = boardUpdateRequestDto.getModifiedDate();
         this.title = boardUpdateRequestDto.getTitle();
-        this.imageOpen = boardUpdateRequestDto.isImageOpen();
+        this.imageOpen = boardUpdateRequestDto.getImageOpen();
         this.questEnum = boardUpdateRequestDto.getQuestEnum();
         this.context = boardUpdateRequestDto.getContext();
     }
