@@ -5,6 +5,7 @@ import com.community.site.dto.FileDto.FileResponseDto;
 import com.community.site.entity.BoardList;
 import com.community.site.enumcustom.BoardEnumCustom;
 import com.community.site.enumcustom.ImageOpen;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 import java.util.List;
@@ -16,8 +17,13 @@ import static com.community.site.enumcustom.ImageOpen.OPEN;
 public class BoardResponseDto {
 
     private Long id;
+
+    @JsonFormat(pattern = "yyyy.MM.dd")
     private String createdDate;
+
+    @JsonFormat(pattern = "yyyy.MM.dd")
     private String modifiedDate;
+
     private String nickname;
     private String title;
     private ImageOpen imageOpen;

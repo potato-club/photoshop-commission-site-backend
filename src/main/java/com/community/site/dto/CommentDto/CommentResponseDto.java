@@ -1,6 +1,7 @@
 package com.community.site.dto.CommentDto;
 
 import com.community.site.entity.Comment;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import java.util.List;
@@ -19,9 +20,11 @@ public class CommentResponseDto {
     private String comment;
 
     @ApiModelProperty(value="생성 시간", example = "yyyy.MM.dd HH:mm", hidden = true)
+    @JsonFormat(pattern = "yyyy.MM.dd HH:mm")
     private String createdDate;
 
     @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd HH:mm", hidden = true)
+    @JsonFormat(pattern = "yyyy.MM.dd HH:mm")
     private String modifiedDate;
 
     @ApiModelProperty(value="닉네임", example = "홍길동", required = true)
