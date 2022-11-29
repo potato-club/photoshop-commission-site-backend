@@ -22,10 +22,10 @@ public class TokenController {
     private final TokenService tokenService;
 
     @GetMapping("/check/writer")
-    public boolean checkWriter(@RequestParam CheckEnumRequest requestDto,
+    public boolean checkWriter(@RequestParam Long id,
                                @ApiIgnore HttpServletRequest request,
                                @ApiIgnore HttpServletResponse response) {
-        return tokenService.checkWriter(requestDto, request, response);
+        return tokenService.checkWriter(id, request, response);
     }
 
     @GetMapping("/check/enum")

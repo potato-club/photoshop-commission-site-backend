@@ -51,7 +51,7 @@ public class TokenService {
     }
 
     @Transactional
-    public boolean checkWriter(CheckEnumRequest requestDto, HttpServletRequest request, HttpServletResponse response) {
+    public boolean checkWriter(Long id, HttpServletRequest request, HttpServletResponse response) {
         if (request.getHeader("authorization") == null) {
             return false;
         }
@@ -59,7 +59,7 @@ public class TokenService {
         String accessToken = validateAndReissueToken(request, response);
 
         String email = jwtTokenProvider.getUserEmail(accessToken);
-        String nickname = boardRepository.getById(requestDto.getId()).getNickname();
+        String nickname = boardRepository.getById(id).getNickname();
 
         if (userRepository.getByEmail(email).getNickname().equals(nickname)) {
             return true;
