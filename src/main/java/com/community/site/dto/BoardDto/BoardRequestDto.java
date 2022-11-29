@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,10 +24,10 @@ public class BoardRequestDto {
     private Long id;
 
     @ApiModelProperty(value="생성 시간", example = "yyyy.MM.dd", hidden = true)
-    private String createdDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    private String createdDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 
     @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd", hidden = true)
-    private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    private String modifiedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
 
     @ApiModelProperty(value="게시글 제목", example = "테스트 제목입니다.", required = true)
     private String title;
