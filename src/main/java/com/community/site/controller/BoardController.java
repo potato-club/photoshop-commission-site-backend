@@ -92,7 +92,8 @@ public class BoardController {
                     dataType = "List<MultipartFile>", paramType = "query")
     })
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(List<MultipartFile> image, ImageOpen imageOpen, BoardRequestDto boardListDto,
+    public UploadFileResponse createBoard(List<MultipartFile> image, ImageOpen imageOpen,
+                                          BoardRequestDto boardListDto,
                                           @ApiIgnore HttpServletRequest request,
                                           @ApiIgnore HttpServletResponse response) {
         return boardService.createBoard(image, imageOpen, boardListDto, request, response);

@@ -92,8 +92,8 @@ public class LoginService {
 
                 redisService.setValues(refreshToken, user.getEmail());
 
-                sessionCarrier.add("message", "로그인 성공");
                 sessionCarrier.add("nickname", user.getNickname());
+                sessionCarrier.add("userRole", user.getUserRole());
             }
         } else {
             Random random = new Random();
@@ -127,7 +127,7 @@ public class LoginService {
         }
 
         User user = User.builder()
-                .email("evan37@gmail.com")
+                .email("evan38@gmail.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())
