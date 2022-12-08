@@ -176,8 +176,8 @@ public class BoardService {
                 .build());
     }
 
-    @Transactional
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
+    @Transactional  // 이미지 수정 2차 개발로 연기(return 타입 UploadFileResponse 추후 사용)
+    public void updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
                                           HttpServletRequest request,
                                           HttpServletResponse response) {
 
@@ -194,39 +194,20 @@ public class BoardService {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
         }
 
-        validateDeletedFiles(boardListDto);
-        uploadFiles(boardListDto, boardList);
-
         boardListDto.setImageOpen(imageOpen);
         boardList.update(boardListDto);
 
-        List<String> downloadUri = new ArrayList<>();
-
-        for (MultipartFile Link : boardListDto.getImage()) {
-            downloadUri.add(Link.getOriginalFilename());
-        }
-
-        UploadFileResponse uploadFileResponse = new UploadFileResponse(boardListDto.getId(), downloadUri);
-
-        return uploadFileResponse;
-    }
-
-    private void validateDeletedFiles(BoardUpdateRequestDto boardListDto) {
-        fileRepository.findBySavedFileUrl(boardListDto.getId()).stream()
-                .filter(file -> !boardListDto.getSavedFileUrl().stream().anyMatch(Predicate.isEqual(file.getFileUrl())))
-                .forEach(url -> {
-                    fileRepository.delete(url);
-                    s3UploadService.deleteFile(url.getFileUrl());
-                });
-    }
-
-    private void uploadFiles(BoardUpdateRequestDto boardListDto, BoardList boardList) {
-        boardListDto.getImage()
-                .stream()
-                .forEach(file -> {
-                    String url = s3UploadService.uploadFile(file);
-                    createFile(boardList, url);
-                });
+//        validateDeletedFiles(boardListDto);
+//        uploadFiles(boardListDto, boardList);
+//
+//
+//        List<String> downloadUri = new ArrayList<>();
+//
+//        for (MultipartFile Link : boardListDto.getImage()) {
+//            downloadUri.add(Link.getOriginalFilename());
+//        }
+//
+//        UploadFileResponse uploadFileResponse = new UploadFileResponse(boardListDto.getId(), downloadUri);
     }
 
     @Transactional
@@ -247,4 +228,22 @@ public class BoardService {
 
         boardRepository.delete(boardList);
     }
+
+    //    private void validateDeletedFiles(BoardUpdateRequestDto boardListDto) {
+//        fileRepository.findBySavedFileUrl(boardListDto.getId()).stream()
+//                .filter(file -> !boardListDto.getSavedFileUrl().stream().anyMatch(Predicate.isEqual(file.getFileUrl())))
+//                .forEach(url -> {
+//                    fileRepository.delete(url);
+//                    s3UploadService.deleteFile(url.getFileUrl());
+//                });
+//    }
+//
+//    private void uploadFiles(BoardUpdateRequestDto boardListDto, BoardList boardList) {
+//        boardListDto.getImage()
+//                .stream()
+//                .forEach(file -> {
+//                    String url = s3UploadService.uploadFile(file);
+//                    createFile(boardList, url);
+//                });
+//    }
 }

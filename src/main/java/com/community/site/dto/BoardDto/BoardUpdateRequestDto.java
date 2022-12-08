@@ -33,7 +33,7 @@ public class BoardUpdateRequestDto {
     @ApiModelProperty(value="글 공개 상태", example = "NOT_OPEN", hidden = true)
     private ImageOpen imageOpen;
 
-    @ApiModelProperty(value="의뢰 상태", example = "BEFORE", required = true)
+    @ApiModelProperty(value="의뢰 상태", example = "BEFORE", hidden = true)
     private BoardEnumCustom questEnum;
 
     @ApiModelProperty(value="게시글 내용", example = "테스트 글입니다.", required = true)
@@ -42,9 +42,9 @@ public class BoardUpdateRequestDto {
     @ApiModelProperty(value="사용자 정보", hidden = true)
     private User user;
 
-    @ApiModelProperty(value="기존 사진 저장용 리스트", example = "[test1.png]", hidden = true)
-    private List<String> savedFileUrl = new ArrayList<>();
-
-    @ApiModelProperty(value="사진 리스트", example = "[test1.png, test2.png]", required = true)
-    private List<MultipartFile> image = new ArrayList<>();
+//    @ApiModelProperty(value="기존 사진 저장용 리스트", example = "[test1.png]", hidden = true)
+//    private List<String> savedFileUrl = new ArrayList<>();
+//
+//    @ApiModelProperty(value="사진 리스트", example = "[test1.png, test2.png]", required = true)
+//    private List<MultipartFile> image = new ArrayList<>();
 }

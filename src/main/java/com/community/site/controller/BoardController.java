@@ -102,10 +102,11 @@ public class BoardController {
 
     @PutMapping("/list/update")
 
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
+    public ResponseEntity<String> updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
                                           @ApiIgnore HttpServletRequest request,
                                           @ApiIgnore HttpServletResponse response) {
-        return boardService.updateBoard(boardListDto, imageOpen, request, response);
+        boardService.updateBoard(boardListDto, imageOpen, request, response);
+        return ResponseEntity.ok("게시글이 수정되었습니다.");
     }
 
 
