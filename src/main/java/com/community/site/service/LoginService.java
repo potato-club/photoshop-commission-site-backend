@@ -5,7 +5,6 @@ import com.community.site.Repository.CommentRepository;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserRequestDto;
 import com.community.site.dto.UserDto.UserResponseDto;
-import com.community.site.entity.BoardList;
 import com.community.site.error.ErrorCode;
 import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.service.Jwt.RedisService;
@@ -21,12 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 @RequiredArgsConstructor
@@ -36,8 +33,6 @@ import java.util.Random;
 public class LoginService {
 
     private final UserRepository userRepository;
-    private final BoardRepository boardRepository;
-    private final CommentRepository commentRepository;
     private final KakaoAPI kakaoAPI;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
