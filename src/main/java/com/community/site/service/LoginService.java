@@ -1,8 +1,11 @@
 package com.community.site.service;
 
+import com.community.site.Repository.BoardRepository;
+import com.community.site.Repository.CommentRepository;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserRequestDto;
 import com.community.site.dto.UserDto.UserResponseDto;
+import com.community.site.entity.BoardList;
 import com.community.site.error.ErrorCode;
 import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.service.Jwt.RedisService;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 @RequiredArgsConstructor
@@ -32,6 +36,8 @@ import java.util.Random;
 public class LoginService {
 
     private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
     private final KakaoAPI kakaoAPI;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
@@ -127,7 +133,7 @@ public class LoginService {
         }
 
         User user = User.builder()
-                .email("evan38@gmail.com")
+                .email("evan39@gmail.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())
@@ -207,11 +213,13 @@ public class LoginService {
     @Transactional
     public void delete(HttpServletRequest request, HttpServletResponse response) {    // 회원 탈퇴
         String token = tokenService.validateAndReissueToken(request, response);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
         userRepository.delete(user);
+        redisService.delValues(refreshToken);
     }
 }

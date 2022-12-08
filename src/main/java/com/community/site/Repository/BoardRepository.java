@@ -1,6 +1,7 @@
 package com.community.site.Repository;
 
 import com.community.site.entity.BoardList;
+import com.community.site.entity.User;
 import com.community.site.enumcustom.BoardEnumCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +18,6 @@ public interface BoardRepository extends JpaRepository<BoardList, Long> {
     Optional<BoardList> findById(Long id);
     Page<BoardList> findAllByQuestEnum(BoardEnumCustom questEnum, Pageable pageable);
     List<BoardList> findByQuestEnum(BoardEnumCustom questEnum);
+    boolean existsByUser(User user);
+    List<BoardList> getByUser(User user);
 }

@@ -59,8 +59,16 @@ public class BoardList {
     @JoinColumn(name = "users")
     private User user;
 
+    @OneToOne
+    @JoinColumn(name = "selected_artist")
+    private User selectedArtist;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<String> requestList = new ArrayList<>();
+
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
-    @OrderBy("id asc") // 오름차순 정렬
+    @OrderBy("id desc") // 내림차순 정렬
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
@@ -72,5 +80,13 @@ public class BoardList {
         this.imageOpen = boardUpdateRequestDto.getImageOpen();
         this.questEnum = boardUpdateRequestDto.getQuestEnum();
         this.context = boardUpdateRequestDto.getContext();
+    }
+
+    public void updateAcceptQuest(String userNickname) {
+        this.requestList.add(userNickname);
+    }
+
+    public void choiceArtist(User selectedArtist) {
+        this.selectedArtist = selectedArtist;
     }
 }
