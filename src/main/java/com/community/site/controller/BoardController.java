@@ -1,6 +1,7 @@
 package com.community.site.controller;
 
 import com.community.site.dto.BoardDto.*;
+import com.community.site.enumcustom.ImageOpen;
 import com.community.site.service.BoardService;
 import com.community.site.service.S3.S3DownloadService;
 import io.swagger.annotations.Api;
@@ -9,12 +10,14 @@ import io.swagger.annotations.ApiImplicitParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -30,18 +33,18 @@ public class BoardController {
     private final S3DownloadService s3DownloadService;
 
     @GetMapping("/main/before/all")
-    public List<ThumbnailResponseDto> getAllBeforeBoardList() {
-        return boardService.getAllBeforeBoardList();
+    public Page<ThumbnailResponseDto> getAllBeforeBoardList(@RequestParam("page") int page) {
+        return boardService.getAllBeforeBoardList(page);
     }
 
     @GetMapping("/main/requesting/all")
-    public List<ThumbnailResponseDto> getAllRequestingBoardList() {
-        return boardService.getAllRequestingBoardList();
+    public Page<ThumbnailResponseDto> getAllRequestingBoardList(@RequestParam("page") int page) {
+        return boardService.getAllRequestingBoardList(page);
     }
 
     @GetMapping("/main/complete/all")
-    public List<ThumbnailResponseDto> getAllCompleteBoardList() {
-        return boardService.getAllCompleteBoardList();
+    public Page<ThumbnailResponseDto> getAllCompleteBoardList(@RequestParam("page") int page) {
+        return boardService.getAllCompleteBoardList(page);
     }
 
     @GetMapping("/main/before")
@@ -60,7 +63,7 @@ public class BoardController {
     }
 
     @GetMapping("/list/{id}")
-    public List<BoardResponseDto> findBoardList(@PathVariable Long id) {
+    public BoardResponseDto findBoardList(@PathVariable Long id) {
         return boardService.findBoardList(id);
     }
 
@@ -69,17 +72,18 @@ public class BoardController {
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/filter/title")
-    public List<ThumbnailResponseDto> getTitleBoardList(@RequestParam String keyword) {
-        return boardService.getTitleBoardList(keyword);
+    public Page<ThumbnailResponseDto> getTitleBoardList(@RequestParam String keyword, @RequestParam("page") int page) {
+        return boardService.getTitleBoardList(keyword, page);
     }
+
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "keyword", value = "nickname 값", required = true,
                     dataType = "String", paramType = "query")
     })
     @GetMapping("/filter/nickname")
-    public List<ThumbnailResponseDto> getNicknameBoardList(@RequestParam String keyword) {
-        return boardService.getNicknameBoardList(keyword);
+    public Page<ThumbnailResponseDto> getNicknameBoardList(@RequestParam String keyword, @RequestParam("page") int page) {
+        return boardService.getNicknameBoardList(keyword, page);
     }
 
 
@@ -88,22 +92,28 @@ public class BoardController {
                     dataType = "List<MultipartFile>", paramType = "query")
     })
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
-                                          @ApiIgnore HttpServletRequest request) {
-        return boardService.createBoard(image, boardListDto, request);
+    public UploadFileResponse createBoard(List<MultipartFile> image, ImageOpen imageOpen,
+                                          BoardRequestDto boardListDto,
+                                          @ApiIgnore HttpServletRequest request,
+                                          @ApiIgnore HttpServletResponse response) {
+        return boardService.createBoard(image, imageOpen, boardListDto, request, response);
     }
 
 
     @PutMapping("/list/update")
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto,
-                                          @ApiIgnore HttpServletRequest request) {
-        return boardService.updateBoard(boardListDto, request);
+
+    public ResponseEntity<String> updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
+                                          @ApiIgnore HttpServletRequest request,
+                                          @ApiIgnore HttpServletResponse response) {
+        boardService.updateBoard(boardListDto, imageOpen, request, response);
+        return ResponseEntity.ok("게시글이 수정되었습니다.");
     }
 
 
     @DeleteMapping("/list/{id}")
-    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @ApiIgnore HttpServletRequest request) {
-        boardService.deleteBoard(id, request);
+    public ResponseEntity<String> deleteBoard(@PathVariable Long id, @ApiIgnore HttpServletRequest request,
+                                              @ApiIgnore HttpServletResponse response) {
+        boardService.deleteBoard(id, request, response);
         return ResponseEntity.ok("게시글이 삭제되었습니다.");
     }
 

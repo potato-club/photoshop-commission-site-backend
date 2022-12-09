@@ -1,15 +1,18 @@
 package com.community.site.service;
 
-import com.community.site.Repository.UserRepository;
-import com.community.site.dto.JwtDto.TokenResponse;
+import com.community.site.Repository.BoardRepository;
+import com.community.site.Repository.CommentRepository;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserRequestDto;
 import com.community.site.dto.UserDto.UserResponseDto;
+import com.community.site.error.ErrorCode;
+import com.community.site.error.exception.UnAuthorizedException;
+import com.community.site.service.Jwt.RedisService;
+import com.community.site.Repository.UserRepository;
+import com.community.site.dto.JwtDto.TokenResponse;
 import com.community.site.entity.User;
 import com.community.site.enumcustom.UserRole;
-import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
-import com.community.site.service.Jwt.RedisService;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Random;
 
-import static com.community.site.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
-
-
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -36,14 +36,15 @@ public class LoginService {
     private final KakaoAPI kakaoAPI;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
+    private final TokenService tokenService;
 
     @Transactional
     public MultiValueMap<String, Object> signUp(UserRequestDto userDto, HttpServletResponse response) {
 
         if (!userRepository.existsByNickname(userDto.getSerialCode())) {
-            throw new UnAuthorizedException("식별코드가 일치하지 않습니다.", ACCESS_DENIED_EXCEPTION);
+            throw new UnAuthorizedException("식별코드가 일치하지 않습니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         } else if (userRepository.existsByNickname(userDto.getNickname())) {
-            throw new UnAuthorizedException("중복된 닉네임입니다.", ACCESS_DENIED_EXCEPTION);
+            throw new UnAuthorizedException("중복된 닉네임입니다.", ErrorCode.ACCESS_DENIED_EXCEPTION);
         }
 
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
@@ -61,6 +62,7 @@ public class LoginService {
 
         redisService.setValues(refreshToken, user.getEmail());
         sessionCarrier.add("message", "회원가입 성공");
+        sessionCarrier.add("nickname", user.getNickname());
 
         return sessionCarrier;
     }
@@ -76,7 +78,7 @@ public class LoginService {
         if (userRepository.existsByEmail(email)) {
 
             User user = userRepository.findByEmail(email).orElseThrow(() ->
-                { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+                { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
             if (user.getIntroduction().equals("")) {
                 userRepository.delete(user);
@@ -91,7 +93,8 @@ public class LoginService {
 
                 redisService.setValues(refreshToken, user.getEmail());
 
-                sessionCarrier.add("message", "로그인 성공");
+                sessionCarrier.add("nickname", user.getNickname());
+                sessionCarrier.add("userRole", user.getUserRole());
             }
         } else {
             Random random = new Random();
@@ -119,13 +122,13 @@ public class LoginService {
 
     @Transactional
     public TokenResponse createToken(UserRequestDto userRequestDto, HttpServletResponse response) {
-
+        // test code
         if (userRepository.existsByNickname(userRequestDto.getNickname())) {
-            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+            throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION);
         }
 
         User user = User.builder()
-                .email(userRequestDto.getEmail())
+                .email(userRequestDto.getNickname() + "@naver.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())
@@ -150,23 +153,17 @@ public class LoginService {
     }
 
     @Transactional
-    public String resolverToken(UserMyPageRequestDto requestDto,
-                                HttpServletRequest request, HttpServletResponse response) {
+    public String resolverToken(UserMyPageRequestDto requestDto, HttpServletRequest request,
+                                HttpServletResponse response) {
 
-        String authorization = jwtTokenProvider.resolveAccessToken(request);
+        // test code
+        String authorization = tokenService.validateAndReissueToken(request, response);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
-        System.out.println(authorization);
-        System.out.println(refreshToken);
-
-        boolean a = jwtTokenProvider.validateToken(authorization);
-        System.out.println(a);
-
-        String email = jwtTokenProvider.getUserEmail(refreshToken);
-        System.out.println(email);
+        String email = jwtTokenProvider.getUserEmail(authorization);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
         UserRequestDto updateUser = UserRequestDto.builder()
                 .nickname(requestDto.getNickname())
@@ -175,13 +172,16 @@ public class LoginService {
                 .build();
 
         user.update(updateUser);
+        jwtTokenProvider.setHeaderAccessToken(response, authorization);
+        log.info(response.getHeader("authorization"));
         return "내 정보 업데이트 완료";
     }
 
     @Transactional
-    public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request) {    // 내 정보 업데이트
-        if (!jwtTokenProvider.validateToken(jwtTokenProvider.resolveAccessToken(request))) {
-            throw new JwtException("새로고침 필요!");
+    public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request,
+                             HttpServletResponse response) {    // 내 정보 업데이트
+        if (!jwtTokenProvider.validateToken(tokenService.validateAndReissueToken(request, response))) {
+            throw new JwtException("다시 로그인 해주시길 바랍니다.");
         }
 
         UserRequestDto myDto = UserRequestDto.builder()
@@ -194,25 +194,27 @@ public class LoginService {
     }
 
     @Transactional
-    public UserResponseDto viewMyPage(HttpServletRequest request) {     // 내 정보 보기
-        String token = jwtTokenProvider.resolveAccessToken(request);
+    public UserResponseDto viewMyPage(HttpServletRequest request, HttpServletResponse response) {     // 내 정보 보기
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
         UserResponseDto userResponseDto = new UserResponseDto(user);
         return userResponseDto;
     }
 
     @Transactional
-    public void delete(HttpServletRequest request) {    // 회원 탈퇴
-        String token = jwtTokenProvider.resolveAccessToken(request);
+    public void delete(HttpServletRequest request, HttpServletResponse response) {    // 회원 탈퇴
+        String token = tokenService.validateAndReissueToken(request, response);
+        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
         userRepository.delete(user);
+        redisService.delValues(refreshToken);
     }
 }

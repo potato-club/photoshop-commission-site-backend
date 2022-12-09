@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static javax.persistence.CascadeType.ALL;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -52,7 +54,7 @@ public class Comment {
     private BoardList boardList;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Builder
@@ -74,7 +76,7 @@ public class Comment {
         return new Comment(user, boardList, comment, requestDto, null);
     }
 
-    public static Comment child(User user, BoardList boardList, String comment, CommentRequestDto requestDto ,Comment parent) {
+    public static Comment child(User user, BoardList boardList, String comment, CommentRequestDto requestDto, Comment parent) {
         Comment child = new Comment(user, boardList, comment, requestDto, parent);
         parent.getChildren().add(child);
         return child;

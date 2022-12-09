@@ -19,7 +19,6 @@ import java.util.UUID;
 
 import static com.community.site.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -51,7 +50,6 @@ public class S3UploadService {
     }
 
     // 파일 유효성 검사
-    @Transactional
     private void validateFileExists(MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
             throw new UnAuthorizedException("FILE_EMPTY", ACCESS_DENIED_EXCEPTION);

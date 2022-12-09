@@ -1,12 +1,12 @@
 package com.community.site.controller;
 
+import com.community.site.enumcustom.UserRole;
 import com.community.site.service.TokenService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,8 +20,15 @@ public class TokenController {
 
     private final TokenService tokenService;
 
-    @PostMapping("/token/validate")
-    public String validateToken(HttpServletRequest request, HttpServletResponse response) {
-        return tokenService.validateToken(request, response);
+    @GetMapping("/check/writer")
+    public boolean checkWriter(@RequestParam Long id,
+                               @ApiIgnore HttpServletRequest request,
+                               @ApiIgnore HttpServletResponse response) {
+        return tokenService.checkWriter(id, request, response);
+    }
+
+    @GetMapping("/check/enum")
+    public UserRole checkEnum(@ApiIgnore HttpServletRequest request, @ApiIgnore HttpServletResponse response) {
+        return tokenService.checkEnum(request, response);
     }
 }

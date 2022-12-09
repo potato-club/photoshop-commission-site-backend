@@ -1,23 +1,30 @@
 package com.community.site.service;
 
-import com.community.site.Repository.BoardRepository.BoardRepository;
+import com.community.site.dto.BoardDto.*;
+import com.community.site.entity.File;
+import com.community.site.enumcustom.ImageOpen;
+import com.community.site.service.S3.S3UploadService;
+import com.community.site.Repository.BoardRepository;
 import com.community.site.Repository.FileRepository.FileRepository;
 import com.community.site.Repository.UserRepository;
-import com.community.site.dto.BoardDto.*;
 import com.community.site.entity.BoardList;
-import com.community.site.entity.File;
 import com.community.site.entity.User;
 import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
-import com.community.site.service.S3.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,94 +45,104 @@ public class BoardService {
     private final S3UploadService s3UploadService;
     private final FileRepository fileRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
 
     @Transactional
-    public List<ThumbnailResponseDto> getTitleBoardList(String keyword) {
-        Optional<BoardList> boardLists = boardRepository.findByTitle(keyword);
-        return boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList());
+    public Page<ThumbnailResponseDto> getTitleBoardList(String keyword, int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findByNickname(keyword, pageable);
+
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getNicknameBoardList(String keyword) {
-        Optional<BoardList> boardLists = boardRepository.findByNickname(keyword);
-        return boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList());
+    public Page<ThumbnailResponseDto> getNicknameBoardList(String keyword, int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findByNickname(keyword, pageable);
+
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<BoardResponseDto> findBoardList(Long id) {
+    public BoardResponseDto findBoardList(Long id) {
         if (boardRepository.getById(id).equals("")) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        Optional<BoardList> boardLists = boardRepository.findById(id);
-        return boardLists.stream().map(BoardResponseDto::new).collect(Collectors.toList());
+        BoardList boardLists = boardRepository.findById(id).orElseThrow();
+        BoardResponseDto boardResponseDto = new BoardResponseDto(boardLists);
+
+        return boardResponseDto;
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getAllBeforeBoardList() {
+    public Page<ThumbnailResponseDto> getAllBeforeBoardList(int page) {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(BEFORE, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(BEFORE))
-                .collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getAllRequestingBoardList() {
+    public Page<ThumbnailResponseDto> getAllRequestingBoardList(int page) {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(REQUESTING, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(REQUESTING))
-                .collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
-    public List<ThumbnailResponseDto> getAllCompleteBoardList() {
+    public Page<ThumbnailResponseDto> getAllCompleteBoardList(int page) {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(COMPLETE, pageable);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(COMPLETE))
-                .collect(Collectors.toList());
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
 
     @Transactional
     public List<ThumbnailResponseDto> getBeforeBoardList() {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        List<BoardList> boardLists = boardRepository.findByQuestEnum(BEFORE);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(BEFORE))
-                .limit(8).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
     @Transactional
     public List<ThumbnailResponseDto> getRequestingBoardList() {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        List<BoardList> boardLists = boardRepository.findByQuestEnum(REQUESTING);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(REQUESTING))
-                .limit(8).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
     @Transactional
     public List<ThumbnailResponseDto> getCompleteBoardList() {
 
-        List<BoardList> boardLists = boardRepository.findAll();
+        List<BoardList> boardLists = boardRepository.findByQuestEnum(COMPLETE);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).filter(b -> b.getQuestEnum().equals(COMPLETE))
-                .limit(8).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
     @Transactional
-    public UploadFileResponse createBoard(List<MultipartFile> image, BoardRequestDto boardListDto,
-                                          HttpServletRequest request) {
+    public UploadFileResponse createBoard(List<MultipartFile> image, ImageOpen imageOpen,
+                                          BoardRequestDto boardListDto,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         boardListDto.setUser(user);
+        boardListDto.setImageOpen(imageOpen);
+        boardListDto.setQuestEnum(BEFORE);
 
         BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
@@ -159,10 +176,12 @@ public class BoardService {
                 .build());
     }
 
-    @Transactional
-    public UploadFileResponse updateBoard(BoardUpdateRequestDto boardListDto, HttpServletRequest request) {
+    @Transactional  // 이미지 수정 2차 개발로 연기(return 타입 UploadFileResponse 추후 사용)
+    public void updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -175,44 +194,26 @@ public class BoardService {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
         }
 
-        validateDeletedFiles(boardListDto);
-        uploadFiles(boardListDto, boardList);
-
+        boardListDto.setImageOpen(imageOpen);
         boardList.update(boardListDto);
 
-        List<String> downloadUri = new ArrayList<>();
-
-        for (MultipartFile Link : boardListDto.getImage()) {
-            downloadUri.add(Link.getOriginalFilename());
-        }
-
-        UploadFileResponse uploadFileResponse = new UploadFileResponse(boardListDto.getId(), downloadUri);
-
-        return uploadFileResponse;
-    }
-
-    private void validateDeletedFiles(BoardUpdateRequestDto boardListDto) {
-        fileRepository.findBySavedFileUrl(boardListDto.getId()).stream()
-                .filter(file -> !boardListDto.getSavedFileUrl().stream().anyMatch(Predicate.isEqual(file.getFileUrl())))
-                .forEach(url -> {
-                    fileRepository.delete(url);
-                    s3UploadService.deleteFile(url.getFileUrl());
-                });
-    }
-
-    private void uploadFiles(BoardUpdateRequestDto boardListDto, BoardList boardList) {
-        boardListDto.getImage()
-                .stream()
-                .forEach(file -> {
-                    String url = s3UploadService.uploadFile(file);
-                    createFile(boardList, url);
-                });
+//        validateDeletedFiles(boardListDto);
+//        uploadFiles(boardListDto, boardList);
+//
+//
+//        List<String> downloadUri = new ArrayList<>();
+//
+//        for (MultipartFile Link : boardListDto.getImage()) {
+//            downloadUri.add(Link.getOriginalFilename());
+//        }
+//
+//        UploadFileResponse uploadFileResponse = new UploadFileResponse(boardListDto.getId(), downloadUri);
     }
 
     @Transactional
-    public void deleteBoard(Long id, HttpServletRequest request) {
+    public void deleteBoard(Long id, HttpServletRequest request, HttpServletResponse response) {
 
-        String token = jwtTokenProvider.resolveAccessToken(request);
+        String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
@@ -227,4 +228,22 @@ public class BoardService {
 
         boardRepository.delete(boardList);
     }
+
+    //    private void validateDeletedFiles(BoardUpdateRequestDto boardListDto) {
+//        fileRepository.findBySavedFileUrl(boardListDto.getId()).stream()
+//                .filter(file -> !boardListDto.getSavedFileUrl().stream().anyMatch(Predicate.isEqual(file.getFileUrl())))
+//                .forEach(url -> {
+//                    fileRepository.delete(url);
+//                    s3UploadService.deleteFile(url.getFileUrl());
+//                });
+//    }
+//
+//    private void uploadFiles(BoardUpdateRequestDto boardListDto, BoardList boardList) {
+//        boardListDto.getImage()
+//                .stream()
+//                .forEach(file -> {
+//                    String url = s3UploadService.uploadFile(file);
+//                    createFile(boardList, url);
+//                });
+//    }
 }

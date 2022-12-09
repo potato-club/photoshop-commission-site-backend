@@ -1,5 +1,8 @@
 package com.community.site.service;
 
+import com.community.site.Repository.BoardRepository;
+import com.community.site.Repository.UserRepository;
+import com.community.site.enumcustom.UserRole;
 import com.community.site.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+
+import static com.community.site.enumcustom.UserRole.GUEST;
 
 @RequiredArgsConstructor
 @Transactional
@@ -18,30 +22,62 @@ import java.util.List;
 public class TokenService {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
 
     @Transactional
-    public String validateToken(HttpServletRequest request, HttpServletResponse response) {
+    public String validateAndReissueToken(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
-        if (!jwtTokenProvider.validateToken(accessToken) && refreshToken != null) {
+        boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
+        boolean checkAccessToken = jwtTokenProvider.validateToken(accessToken);
+        boolean checkRefreshToken = jwtTokenProvider.validateToken(refreshToken);
 
-            boolean validateRefreshToken = jwtTokenProvider.validateToken(refreshToken);
-            boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
-
-            if (validateRefreshToken && isRefreshToken) {
-                String email = jwtTokenProvider.getUserEmail(refreshToken);
-                List<String> roles = jwtTokenProvider.getRoles(email);
-
-                String newAccessToken = jwtTokenProvider.createAccessToken(email, roles);
+        if (checkAccessToken && checkRefreshToken) {
+            return accessToken;
+        } else if (!checkAccessToken && refreshToken != null) {
+            if (checkRefreshToken && isRefreshToken) {
+                String newAccessToken = jwtTokenProvider.reissueAccessToken(refreshToken);
                 jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
-
-                return "액세스 토큰 재발급 완료";
+                return newAccessToken;
             }
         } else {
             throw new JwtException("다시 로그인 해주세요.");
         }
 
-        return "토큰 양호";
+        return accessToken;
+    }
+
+    @Transactional
+    public boolean checkWriter(Long id, HttpServletRequest request, HttpServletResponse response) {
+        if (request.getHeader("authorization") == null) {
+            return false;
+        }
+
+        String accessToken = validateAndReissueToken(request, response);
+
+        String email = jwtTokenProvider.getUserEmail(accessToken);
+        String nickname = boardRepository.getById(id).getNickname();
+
+        if (userRepository.getByEmail(email).getNickname().equals(nickname)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Transactional
+    public UserRole checkEnum(HttpServletRequest request, HttpServletResponse response) {
+        if (request.getHeader("authorization") == null) {
+            return GUEST;
+        }
+
+        String accessToken = validateAndReissueToken(request, response);
+
+        String email = jwtTokenProvider.getUserEmail(accessToken);
+        UserRole userEnum = userRepository.getByEmail(email).getUserRole();
+
+        return userEnum;
     }
 }

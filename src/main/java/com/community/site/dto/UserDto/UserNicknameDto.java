@@ -1,6 +1,9 @@
 package com.community.site.dto.UserDto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
@@ -8,5 +11,4 @@ import lombok.*;
 @AllArgsConstructor
 public class UserNicknameDto {
     private String nickname;
-
 }

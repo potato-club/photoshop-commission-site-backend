@@ -17,7 +17,6 @@ public class UserRequestDto {
     @ApiModelProperty(value="식별번호", example = "ID123456", required = true)
     private String serialCode;
 
-    private String email;
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "닉네임은 특수문자를 제외한 2~8자리여야 합니다.")
     @NotBlank(message = "닉네임은 필수 입력 값입니다.")
     @ApiModelProperty(value="닉네임", example = "홍길동", required = true)

@@ -1,6 +1,7 @@
 package com.community.site.dto.CommentDto;
 
 import com.community.site.entity.BoardList;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

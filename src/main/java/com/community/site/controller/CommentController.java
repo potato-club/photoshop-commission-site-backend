@@ -1,10 +1,10 @@
 package com.community.site.controller;
 
 import com.community.site.dto.CommentDto.CommentDeleteRequestDto;
-import com.community.site.dto.CommentDto.CommentRequestDto;
 import com.community.site.dto.CommentDto.CommentResponseDto;
 import com.community.site.dto.CommentDto.CommentUpdateRequestDto;
 import com.community.site.service.CommentService;
+import com.community.site.dto.CommentDto.CommentRequestDto;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -26,14 +27,15 @@ public class CommentController {
 
     @PostMapping("/list/{id}/comments/parent")
     public ResponseEntity<String> createParentComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto,
-                                        @ApiIgnore HttpServletRequest request) {
-        return ResponseEntity.ok(commentService.createParentComment(id, commentRequestDto, request));
+                                        @ApiIgnore HttpServletRequest request, @ApiIgnore HttpServletResponse response) {
+        return ResponseEntity.ok(commentService.createParentComment(id, commentRequestDto, request, response));
     }
 
     @PostMapping("/list/{id}/comments/child")
     public ResponseEntity<String> createChildComment(@RequestBody CommentRequestDto commentRequestDto,
-                                                @ApiIgnore HttpServletRequest request) {
-        return ResponseEntity.ok(commentService.createChildComment(commentRequestDto, request));
+                                                     @ApiIgnore HttpServletRequest request,
+                                                     @ApiIgnore HttpServletResponse response) {
+        return ResponseEntity.ok(commentService.createChildComment(commentRequestDto, request, response));
     }
 
     @GetMapping("/list/{id}/comments")
@@ -43,15 +45,15 @@ public class CommentController {
 
     @PutMapping("/list/{id}/comments")
     public ResponseEntity<String> updateComment(@RequestBody CommentUpdateRequestDto commentRequestDto,
-                                        HttpServletRequest request) {
-        commentService.updateComment(commentRequestDto, request);
+                                        @ApiIgnore HttpServletRequest request, @ApiIgnore HttpServletResponse response) {
+        commentService.updateComment(commentRequestDto, request, response);
         return ResponseEntity.ok("댓글 업데이트 성공");
     }
 
     @DeleteMapping("/list/{id}/comments")
     public ResponseEntity<String> delete(@RequestBody CommentDeleteRequestDto requestDto,
-            HttpServletRequest request) {
-        commentService.deleteComment(requestDto, request);
+            @ApiIgnore HttpServletRequest request, @ApiIgnore HttpServletResponse response) {
+        commentService.deleteComment(requestDto, request, response);
         return ResponseEntity.ok("댓글 삭제 완료");
     }
 }

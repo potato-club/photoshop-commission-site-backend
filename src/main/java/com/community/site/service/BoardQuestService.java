@@ -1,6 +1,6 @@
 package com.community.site.service;
 
-import com.community.site.Repository.BoardRepository.BoardRepository;
+import com.community.site.Repository.BoardRepository;
 import com.community.site.Repository.UserRepository;
 import com.community.site.dto.UserDto.UserNicknameDto;
 import com.community.site.entity.BoardList;
@@ -26,20 +26,27 @@ import static com.community.site.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class MissionService {
+public class BoardQuestService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public List<UserNicknameDto> getRequestUserList(Long id) {
+    public List<UserNicknameDto> getRequestUserList(Long id, HttpServletRequest request) {
+        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
         Optional<BoardList> boardList = boardRepository.findById(id);
         List<UserNicknameDto> requestList = new ArrayList<>();
 
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
         if (boardList.isEmpty()) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+        } else if(!boardList.get().getUser().equals(user)) {
+            throw new UnAuthorizedException("게시글 작성자만 확인 가능합니다.", ACCESS_DENIED_EXCEPTION);
         }
+
         for (String nickname : boardList.get().getRequestList()) {
             requestList.add(UserNicknameDto.builder().nickname(nickname).build());
         }
@@ -48,28 +55,26 @@ public class MissionService {
     }
 
     @Transactional
-    public void addRequestUser(Long id, HttpServletRequest request) {
+    public void acceptQuest(Long id, HttpServletRequest request) {
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
         Optional<BoardList> boardList = boardRepository.findById(id);
+        System.out.println(email);
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
-        {
-            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
-        });
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
+        System.out.println(user.getUserRole());
         if (user.getUserRole() != UserRole.ARTIST) {
             throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
-        }
-
-        if (boardList.isEmpty()) {
+        } else if (boardList.isEmpty()) {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        boardList.get().addRequestUser(user.getNickname());
+        boardList.get().updateAcceptQuest(user.getNickname());
     }
 
     @Transactional
-    public String setBoardArtist(Long id, UserNicknameDto artistDto) {
+    public void chooseArtist(Long id, UserNicknameDto artistDto) {
         Optional<BoardList> boardList = boardRepository.findById(id);
         User artist = userRepository.findByNickname(artistDto.getNickname());
 
@@ -78,7 +83,5 @@ public class MissionService {
         }
 
         boardList.get().choiceArtist(artist);
-
-        return artist.getNickname();
     }
 }
