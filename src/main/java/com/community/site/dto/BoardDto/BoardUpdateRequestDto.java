@@ -8,21 +8,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardUpdateRequestDto {
-
-    @ApiModelProperty(value="게시글 번호", example = "1", required = true)
-    private Long id;
 
     @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd", hidden = true)
     private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));

@@ -75,31 +75,4 @@ public class LoginController {
                                 HttpServletResponse response) {
         return loginService.resolverToken(requestDto, request, response);
     }
-
-
-    @PutMapping("/mypage")
-    public UserResponseDto viewMyPage(@ApiIgnore HttpServletRequest request, @ApiIgnore HttpServletResponse response) {
-        return loginService.viewMyPage(request, response);
-    }
-
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userDto", value = "업데이트 값", required = true,
-                    dataType = "Object", paramType = "query")
-    })
-    @PutMapping("/mypage/update")
-    public ResponseEntity<String> updateMyPage(@RequestBody UserMyPageRequestDto userDto,
-                                               @ApiIgnore HttpServletRequest request,
-                                               @ApiIgnore HttpServletResponse response) {
-        loginService.updateMyPage(userDto, request, response);
-        return ResponseEntity.ok("회원정보가 수정되었습니다.");
-    }
-
-
-    @DeleteMapping("/mypage/delete")
-    public ResponseEntity<String> deleteUser(@ApiIgnore HttpServletRequest request,
-                                             @ApiIgnore HttpServletResponse response) {
-        loginService.delete(request, response);
-        return ResponseEntity.ok("회원탈퇴 처리 되었습니다.");
-    }
 }

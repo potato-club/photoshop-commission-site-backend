@@ -174,45 +174,4 @@ public class LoginService {
         log.info(response.getHeader("authorization"));
         return "내 정보 업데이트 완료";
     }
-
-    @Transactional
-    public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request,
-                             HttpServletResponse response) {    // 내 정보 업데이트
-        if (!jwtTokenProvider.validateToken(tokenService.validateAndReissueToken(request, response))) {
-            throw new JwtException("다시 로그인 해주시길 바랍니다.");
-        }
-
-        UserRequestDto myDto = UserRequestDto.builder()
-                .nickname(userDto.getNickname())
-                .userRole(userDto.getUserRole())
-                .introduction(userDto.getIntroduction())
-                .build();
-
-        myDto.toEntity();
-    }
-
-    @Transactional
-    public UserResponseDto viewMyPage(HttpServletRequest request, HttpServletResponse response) {     // 내 정보 보기
-        String token = tokenService.validateAndReissueToken(request, response);
-        String email = jwtTokenProvider.getUserEmail(token);
-
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
-
-        UserResponseDto userResponseDto = new UserResponseDto(user);
-        return userResponseDto;
-    }
-
-    @Transactional
-    public void delete(HttpServletRequest request, HttpServletResponse response) {    // 회원 탈퇴
-        String token = tokenService.validateAndReissueToken(request, response);
-        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
-        String email = jwtTokenProvider.getUserEmail(token);
-
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
-
-        userRepository.delete(user);
-        redisService.delValues(refreshToken);
-    }
 }

@@ -21,14 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.community.site.enumcustom.BoardEnumCustom.*;
@@ -177,7 +174,7 @@ public class BoardService {
     }
 
     @Transactional  // 이미지 수정 2차 개발로 연기(return 타입 UploadFileResponse 추후 사용)
-    public void updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
+    public void updateBoard(Long id, BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
                                           HttpServletRequest request,
                                           HttpServletResponse response) {
 
@@ -187,7 +184,7 @@ public class BoardService {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        BoardList boardList = boardRepository.findById(boardListDto.getId()).orElseThrow(() ->
+        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
             { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         if (!boardList.getUser().getNickname().equals(user.getNickname())) {
