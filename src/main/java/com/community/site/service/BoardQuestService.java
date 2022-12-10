@@ -74,7 +74,6 @@ public class BoardQuestService {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        boardList.get().choiceArtist(artist);
-        boardList.get().changeBoardEnum(BoardEnumCustom.REQUESTING);
+        boardList.get().choiceArtist(artist, BoardEnumCustom.REQUESTING);
     }
 }
