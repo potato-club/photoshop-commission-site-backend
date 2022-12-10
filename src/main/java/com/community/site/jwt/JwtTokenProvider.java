@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -48,15 +49,18 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성.
+    @Transactional
     public String createAccessToken(String email, List<String> roles) {
         return this.createToken(email, roles, accessTokenValidTime);
     }
     // Refresh Token 생성.
+    @Transactional
     public String createRefreshToken(String email, List<String> roles) {
         return this.createToken(email, roles, refreshTokenValidTime);
     }
 
     // Create token
+    @Transactional
     public String createToken(String email, List<String> roles, long tokenValid) {
         Claims claims = Jwts.claims().setSubject(email); // claims 생성 및 payload 설정
         claims.put("roles", roles); // 권한 설정, key/ value 쌍으로 저장
@@ -71,16 +75,19 @@ public class JwtTokenProvider {
     }
 
     // JWT 토큰에서 인증 정보 조회
+    @Transactional
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(this.getUserEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     // 토큰에서 회원 정보 추출
+    @Transactional
     public String getUserEmail(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
+    @Transactional
     public String reissueAccessToken(String refreshToken) {
         String email = redisService.getValues(refreshToken);
         if (Objects.isNull(email)) {
@@ -94,12 +101,14 @@ public class JwtTokenProvider {
     }
 
     // Request의 Header에서 AccessToken 값을 가져옵니다. "authorization" : "token"
+    @Transactional
     public String resolveAccessToken(HttpServletRequest request) {
         if(request.getHeader("authorization") != null )
             return request.getHeader("authorization").substring(7);
         return null;
     }
     // Request의 Header에서 RefreshToken 값을 가져옵니다. "refreshToken" : "token"
+    @Transactional
     public String resolveRefreshToken(HttpServletRequest request) {
         if(request.getHeader("refreshToken") != null )
             return request.getHeader("refreshToken").substring(7);
@@ -107,6 +116,7 @@ public class JwtTokenProvider {
     }
 
     // 토큰의 유효성 + 만료일자 확인
+    @Transactional
     public boolean validateToken(String jwtToken) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
@@ -127,21 +137,25 @@ public class JwtTokenProvider {
     }
 
     // 어세스 토큰 헤더 설정
+    @Transactional
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
         response.setHeader("authorization", "bearer "+ accessToken);
     }
 
     // 리프레시 토큰 헤더 설정
+    @Transactional
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
         response.setHeader("refreshToken", "bearer "+ refreshToken);
     }
 
     // RefreshToken 존재유무 확인
+    @Transactional
     public boolean existsRefreshToken(String refreshToken) {
         return redisService.getValues(refreshToken) != null;
     }
 
     // Email로 권한 정보 가져오기
+    @Transactional
     public List<String> getRoles(String email) {
         return userRepository.findByEmail(email).get().getRoles();
     }
