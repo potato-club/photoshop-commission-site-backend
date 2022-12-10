@@ -86,7 +86,8 @@ public class BoardList {
         this.requestList.add(userNickname);
     }
 
-    public void choiceArtist(User selectedArtist) {
+    public void choiceArtist(User selectedArtist, BoardEnumCustom questEnum) {
         this.selectedArtist = selectedArtist;
+        this.questEnum = questEnum;
     }
 }

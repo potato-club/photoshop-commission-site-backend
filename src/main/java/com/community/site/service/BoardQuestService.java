@@ -5,6 +5,7 @@ import com.community.site.Repository.UserRepository;
 import com.community.site.dto.UserDto.UserNicknameDto;
 import com.community.site.entity.BoardList;
 import com.community.site.entity.User;
+import com.community.site.enumcustom.BoardEnumCustom;
 import com.community.site.enumcustom.UserRole;
 import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
@@ -82,6 +83,6 @@ public class BoardQuestService {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        boardList.get().choiceArtist(artist);
+        boardList.get().choiceArtist(artist, BoardEnumCustom.REQUESTING);
     }
 }

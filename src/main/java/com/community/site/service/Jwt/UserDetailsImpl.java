@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
+
     private final User user;
 
     public User getUser() {
@@ -49,6 +51,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
+    @Transactional
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<String> userRole = user.getRoles();
         String authority = userRole.toString();
