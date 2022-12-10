@@ -1,7 +1,5 @@
 package com.community.site.service;
 
-import com.community.site.Repository.BoardRepository;
-import com.community.site.Repository.CommentRepository;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserRequestDto;
 import com.community.site.dto.UserDto.UserResponseDto;
@@ -61,8 +59,8 @@ public class LoginService {
         jwtTokenProvider.setHeaderRefreshToken(response, refreshToken);
 
         redisService.setValues(refreshToken, user.getEmail());
-        sessionCarrier.add("message", "회원가입 성공");
         sessionCarrier.add("nickname", user.getNickname());
+        sessionCarrier.add("userRole", user.getUserRole());
 
         return sessionCarrier;
     }
