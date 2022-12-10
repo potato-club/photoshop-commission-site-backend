@@ -1,5 +1,6 @@
 package com.community.site.service;
 
+import com.community.site.Repository.BoardRepository;
 import com.community.site.Repository.UserRepository;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserRequestDto;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 public class MyPageService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final BoardRepository boardRepository;
     private final RedisService redisService;
     private final TokenService tokenService;
 

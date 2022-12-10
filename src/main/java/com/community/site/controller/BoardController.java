@@ -100,7 +100,7 @@ public class BoardController {
     }
 
 
-    @PutMapping("/list/{id}/update")
+    @PutMapping("/list/{id}")
     public ResponseEntity<String> updateBoard(@PathVariable Long id, BoardUpdateRequestDto boardListDto,
                                               ImageOpen imageOpen,
                                               @ApiIgnore HttpServletRequest request,

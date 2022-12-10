@@ -78,7 +78,6 @@ public class BoardList {
         this.modifiedDate = boardUpdateRequestDto.getModifiedDate();
         this.title = boardUpdateRequestDto.getTitle();
         this.imageOpen = boardUpdateRequestDto.getImageOpen();
-        this.questEnum = boardUpdateRequestDto.getQuestEnum();
         this.context = boardUpdateRequestDto.getContext();
     }
 
@@ -88,6 +87,10 @@ public class BoardList {
 
     public void choiceArtist(User selectedArtist, BoardEnumCustom questEnum) {
         this.selectedArtist = selectedArtist;
+        this.questEnum = questEnum;
+    }
+
+    public void changeQuestEnum(BoardEnumCustom questEnum) {
         this.questEnum = questEnum;
     }
 }
