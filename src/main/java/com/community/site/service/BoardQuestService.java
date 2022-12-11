@@ -60,7 +60,7 @@ public class BoardQuestService {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        if (user.getUserRole().equals(ARTIST)) {
+        if (!user.getUserRole().equals(ARTIST)) {
             throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
         }
 
