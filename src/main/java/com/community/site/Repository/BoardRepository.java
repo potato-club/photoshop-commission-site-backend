@@ -17,7 +17,6 @@ public interface BoardRepository extends JpaRepository<BoardList, Long> {
     Page<BoardList> findByTitle(String title, Pageable pageable);
     Optional<BoardList> findById(Long id);
     Page<BoardList> findAllByQuestEnum(BoardEnumCustom questEnum, Pageable pageable);
+    Page<BoardList> findAllByUser(User user, Pageable pageable);
     List<BoardList> findByQuestEnum(BoardEnumCustom questEnum);
-    boolean existsByUser(User user);
-    List<BoardList> getByUser(User user);
 }

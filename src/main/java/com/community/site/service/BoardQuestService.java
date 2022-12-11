@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.community.site.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
@@ -35,13 +34,12 @@ public class BoardQuestService {
 
     @Transactional
     public List<UserNicknameDto> getRequestUserList(Long id) {
-        Optional<BoardList> boardList = boardRepository.findById(id);
+        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
         List<UserNicknameDto> requestList = new ArrayList<>();
 
-        if (boardList.isEmpty()) {
-            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
-        }
-        for (String nickname : boardList.get().getRequestList()) {
+        for (String nickname : boardList.getRequestList()) {
             requestList.add(UserNicknameDto.builder().nickname(nickname).build());
         }
 
@@ -51,29 +49,26 @@ public class BoardQuestService {
     @Transactional
     public void acceptQuest(Long id, HttpServletRequest request) {
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
-        Optional<BoardList> boardList = boardRepository.findById(id);
+        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         if (user.getUserRole().equals(UserRole.ARTIST)) {
             throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
-        } else if (boardList.isEmpty()) {
-            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         }
 
-        boardList.get().updateAcceptQuest(user.getNickname());
+        boardList.updateAcceptQuest(user.getNickname());
     }
 
     @Transactional
     public void chooseArtist(Long id, UserNicknameDto artistDto) {
-        Optional<BoardList> boardList = boardRepository.findById(id);
+        BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
+        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
+
         User artist = userRepository.findByNickname(artistDto.getNickname());
 
-        if (boardList.isEmpty()) {
-            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
-        }
-
-        boardList.get().choiceArtist(artist, BoardEnumCustom.REQUESTING);
+        boardList.choiceArtist(artist, BoardEnumCustom.REQUESTING);
     }
 }
