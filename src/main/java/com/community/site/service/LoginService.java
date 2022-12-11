@@ -126,7 +126,7 @@ public class LoginService {
         }
 
         User user = User.builder()
-                .email("evan39@gmail.com")
+                .email("test1234@gmail.com")
                 .introduction(userRequestDto.getIntroduction())
                 .userRole(userRequestDto.getUserRole())
                 .nickname(userRequestDto.getNickname())
