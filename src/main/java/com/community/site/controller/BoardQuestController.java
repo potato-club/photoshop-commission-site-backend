@@ -20,8 +20,8 @@ public class BoardQuestController {
     private final BoardQuestService boardQuestService;
 
     @GetMapping("/list/{id}/request")
-    public List<UserNicknameDto> getRequestUserList(@PathVariable Long id) {
-        return boardQuestService.getRequestUserList(id);
+    public List<UserNicknameDto> getRequestUserList(@PathVariable Long id, HttpServletRequest request) {
+        return boardQuestService.getRequestUserList(id, request);
     }
 
     @PostMapping("/list/{id}/request")

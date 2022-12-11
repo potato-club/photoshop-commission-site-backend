@@ -6,7 +6,6 @@ import com.community.site.dto.UserDto.UserNicknameDto;
 import com.community.site.entity.BoardList;
 import com.community.site.entity.User;
 import com.community.site.enumcustom.BoardEnumCustom;
-import com.community.site.enumcustom.UserRole;
 import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.community.site.enumcustom.UserRole.ARTIST;
 import static com.community.site.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
 
@@ -33,11 +33,16 @@ public class BoardQuestService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public List<UserNicknameDto> getRequestUserList(Long id) {
+    public List<UserNicknameDto> getRequestUserList(Long id, HttpServletRequest request) {
+        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
         BoardList boardList = boardRepository.findById(id).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
         List<UserNicknameDto> requestList = new ArrayList<>();
+
+        if (!boardList.getUser().equals(userRepository.findByEmail(email))) {
+            throw new UnAuthorizedException("게시글 작성자만 확인 가능합니다.", ACCESS_DENIED_EXCEPTION);
+        }
 
         for (String nickname : boardList.getRequestList()) {
             requestList.add(UserNicknameDto.builder().nickname(nickname).build());
@@ -55,7 +60,7 @@ public class BoardQuestService {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        if (user.getUserRole().equals(UserRole.ARTIST)) {
+        if (user.getUserRole().equals(ARTIST)) {
             throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
         }
 
