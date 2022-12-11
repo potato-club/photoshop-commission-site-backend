@@ -48,7 +48,7 @@ public class BoardService {
     public Page<ThumbnailResponseDto> getTitleBoardList(String keyword, int page) {
 
         Pageable pageable = PageRequest.of(page - 1, 16);
-        Page<BoardList> boardLists = boardRepository.findByNickname(keyword, pageable);
+        Page<BoardList> boardLists = boardRepository.findByTitle(keyword, pageable);
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
     }
