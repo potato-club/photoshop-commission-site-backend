@@ -2,7 +2,6 @@ package com.community.site.service;
 
 import com.community.site.Repository.BoardRepository;
 import com.community.site.Repository.UserRepository;
-import com.community.site.dto.JwtDto.CheckEnumRequest;
 import com.community.site.enumcustom.UserRole;
 import com.community.site.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;

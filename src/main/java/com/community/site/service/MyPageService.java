@@ -26,8 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.stream.Collectors;
 
-import static com.community.site.enumcustom.BoardEnumCustom.BEFORE;
-
 @RequiredArgsConstructor
 @Transactional
 @Service
