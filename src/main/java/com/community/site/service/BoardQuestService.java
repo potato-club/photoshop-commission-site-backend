@@ -40,7 +40,7 @@ public class BoardQuestService {
 
         List<UserNicknameDto> requestList = new ArrayList<>();
 
-        if (!boardList.getUser().equals(userRepository.findByEmail(email))) {
+        if (!boardList.getUser().getEmail().equals(email)) {
             throw new UnAuthorizedException("게시글 작성자만 확인 가능합니다.", ACCESS_DENIED_EXCEPTION);
         }
 
@@ -62,6 +62,8 @@ public class BoardQuestService {
 
         if (!user.getUserRole().equals(ARTIST)) {
             throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
+        } else if (boardList.getRequestList().equals(user)) {
+
         }
 
         boardList.updateAcceptQuest(user.getNickname());
