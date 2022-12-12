@@ -61,7 +61,8 @@ public class MyPageService {
         Pageable pageable = PageRequest.of(page - 1, 16);
         Page<BoardList> boardLists = boardRepository.findAllByUser(user, pageable);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
+                pageable, boardLists.getTotalPages());
     }
 
     @Transactional

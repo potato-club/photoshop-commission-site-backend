@@ -1,5 +1,6 @@
 package com.community.site.service;
 
+import com.community.site.dto.UserDto.TestRequestDto;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserRequestDto;
 import com.community.site.dto.UserDto.UserResponseDto;
@@ -119,17 +120,17 @@ public class LoginService {
     }
 
     @Transactional
-    public TokenResponse createToken(UserRequestDto userRequestDto, HttpServletResponse response) {
+    public TokenResponse createToken(TestRequestDto testRequestDto, HttpServletResponse response) {
         // test code
-        if (userRepository.existsByNickname(userRequestDto.getNickname())) {
+        if (userRepository.existsByNickname(testRequestDto.getNickname())) {
             throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION);
         }
 
         User user = User.builder()
-                .email(userRequestDto.getNickname() + "@naver.com")
-                .introduction(userRequestDto.getIntroduction())
-                .userRole(userRequestDto.getUserRole())
-                .nickname(userRequestDto.getNickname())
+                .email(testRequestDto.getEmail())
+                .introduction(testRequestDto.getIntroduction())
+                .userRole(testRequestDto.getUserRole())
+                .nickname(testRequestDto.getNickname())
                 .build();
 
         userRepository.save(user);
