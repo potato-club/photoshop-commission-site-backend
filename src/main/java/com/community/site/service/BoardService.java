@@ -80,7 +80,8 @@ public class BoardService {
         Pageable pageable = PageRequest.of(page - 1, 16);
         Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(BEFORE, pageable);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
+                pageable, boardLists.getTotalPages());
     }
 
     @Transactional
@@ -99,7 +100,8 @@ public class BoardService {
         Pageable pageable = PageRequest.of(page - 1, 16);
         Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(COMPLETE, pageable);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
+                pageable, boardLists.getTotalPages());
     }
 
     @Transactional
