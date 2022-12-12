@@ -11,6 +11,10 @@ import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.community.site.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
@@ -33,56 +38,72 @@ public class BoardQuestService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Transactional
-    public List<UserNicknameDto> getRequestUserList(Long id, HttpServletRequest request) {
-        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
-        Optional<BoardList> boardList = boardRepository.findById(id);
-        List<UserNicknameDto> requestList = new ArrayList<>();
-
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
-
-        if (boardList.isEmpty()) {
+    private BoardList getBoardList(Long id) {
+        return boardRepository.findById(id).orElseThrow(() ->
+        {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
-        } else if(!boardList.get().getUser().equals(user)) {
-            throw new UnAuthorizedException("게시글 작성자만 확인 가능합니다.", ACCESS_DENIED_EXCEPTION);
+        });
+    }
+
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() ->
+        {
+            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+        });
+    }
+
+    private Page<UserNicknameDto> pagingList(int page, List<UserNicknameDto> requestList) {
+        Pageable pageable = PageRequest.of(page - 1, 5);
+
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), requestList.size());
+
+        return new PageImpl<>(requestList.subList(start, end), pageable, requestList.size());
+    }
+
+    @Transactional
+    public Page<UserNicknameDto> getRequestUserList(Long id, int page, HttpServletRequest request) {
+        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
+        BoardList boardList = getBoardList(id);
+        List<UserNicknameDto> requestList;
+        User user = getUserByEmail(email);
+
+        if (!boardList.getUser().equals(user)) {
+            throw new UnAuthorizedException("게시글 작성자만 가능합니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        for (String nickname : boardList.get().getRequestList()) {
-            requestList.add(UserNicknameDto.builder().nickname(nickname).build());
-        }
+        requestList = boardList.getRequestList().stream()
+                .map(n -> UserNicknameDto.builder().nickname(n).build()).collect(Collectors.toList());
 
-        return requestList;
+        return pagingList(page, requestList);
     }
 
     @Transactional
     public void acceptQuest(Long id, HttpServletRequest request) {
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
-        Optional<BoardList> boardList = boardRepository.findById(id);
-        System.out.println(email);
+        BoardList boardList = getBoardList(id);
+        User user = getUserByEmail(email);
 
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
-
-        System.out.println(user.getUserRole());
         if (user.getUserRole() != UserRole.ARTIST) {
             throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
-        } else if (boardList.isEmpty()) {
-            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+        } else if(boardList.getRequestList().contains(user.getNickname())) {
+            throw new UnAuthorizedException("이미 요청된 상태입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        boardList.get().updateAcceptQuest(user.getNickname());
+        boardList.updateAcceptQuest(user.getNickname());
     }
 
     @Transactional
-    public void chooseArtist(Long id, UserNicknameDto artistDto) {
-        Optional<BoardList> boardList = boardRepository.findById(id);
+    public void chooseArtist(Long id, UserNicknameDto artistDto, HttpServletRequest request) {
         User artist = userRepository.findByNickname(artistDto.getNickname());
+        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
+        BoardList boardList = getBoardList(id);
+        User user = getUserByEmail(email);
 
-        if (boardList.isEmpty()) {
-            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+        if (!boardList.getUser().equals(user)) {
+            throw new UnAuthorizedException("게시글 작성자만 가능합니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        boardList.get().choiceArtist(artist, BoardEnumCustom.REQUESTING);
+        boardList.choiceArtist(artist, BoardEnumCustom.REQUESTING);
     }
 }

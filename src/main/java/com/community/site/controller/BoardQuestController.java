@@ -5,6 +5,7 @@ import com.community.site.service.BoardQuestService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,8 @@ public class BoardQuestController {
     private final BoardQuestService boardQuestService;
 
     @GetMapping("/list/{id}/request")
-    public List<UserNicknameDto> getRequestUserList(@PathVariable Long id, HttpServletRequest request) {
-        return boardQuestService.getRequestUserList(id, request);
+    public Page<UserNicknameDto> getRequestUserList(@PathVariable Long id, @RequestParam("page") int page, HttpServletRequest request) {
+        return boardQuestService.getRequestUserList(id, page, request);
     }
 
     @PostMapping("/list/{id}/request")
@@ -31,8 +32,9 @@ public class BoardQuestController {
     }
 
     @PostMapping("/list/{id}/artist")
-    public ResponseEntity<String> chooseArtist(@PathVariable Long id, @RequestBody UserNicknameDto artistDto) {
-        boardQuestService.chooseArtist(id, artistDto);
+    public ResponseEntity<String> chooseArtist(@PathVariable Long id, @RequestBody UserNicknameDto artistDto,
+                                               HttpServletRequest request) {
+        boardQuestService.chooseArtist(id, artistDto, request);
         return ResponseEntity.ok("ARTIST 선택 완료");
     }
 }
