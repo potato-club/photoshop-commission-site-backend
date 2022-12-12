@@ -29,46 +29,14 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="befa3ef1-5004-488e-ba7c-aac5f5b38a56">
-      <console name="photoshopcommission" type="STANDARD" schema="photoshopcommission" session="Main"><![CDATA[create table board_list (
-       id bigint not null AUTO_INCREMENT,
-        created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-        modified_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-        context TEXT not null,
-        nickname varchar(255) not null,
-        quest_enum varchar(255),
-        title varchar(255) not null,
-        users bigint,
-        primary key(id)
-    ) engine=InnoDB;
-
-select * from board_list;
-
-create table files (
-       id bigint not null AUTO_INCREMENT,
-        file_name varchar(255) not null,
-        file_url varchar(255) not null,
-        board_list_id bigint,
-        primary key (id)
-    ) engine=InnoDB;
-    
-select * from files;
-
-select * from comments;
-
-create table comments (
-       id bigint not null AUTO_INCREMENT,
-        comment TEXT not null,
-        created_date varchar(255),
-        modified_date varchar(255),
-        board_list_id bigint,
-        parent bigint,
-        user_id bigint,
-        primary key (id)
-    ) engine=InnoDB;]]></console>
+      <console name="photoshopcommission" type="STANDARD" schema="mysql" session="Main" />
     </connection>
     <connection id="335160f3-3087-4b7f-81ea-2a187cb5fca3">
-      <console name="Connection" type="STANDARD" schema="mysql" session="Main"><![CDATA[select * from board_list]]></console>
+      <console name="Connection" type="STANDARD" schema="mysql" session="Main" />
     </connection>
+  </component>
+  <component name="DBNavigator.Project.DatabaseEditorStateManager">
+    <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files />
