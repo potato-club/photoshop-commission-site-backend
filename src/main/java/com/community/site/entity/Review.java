@@ -30,7 +30,7 @@ public class Review {
     private String content;
 
     @Column(nullable = false)
-    private float grade;
+    private Double grade;
 
     @OneToOne
     @JoinColumn(name = "linked_board_list")

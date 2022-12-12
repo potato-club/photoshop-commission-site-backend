@@ -19,4 +19,5 @@ public interface BoardRepository extends JpaRepository<BoardList, Long> {
     Page<BoardList> findAllByQuestEnum(BoardEnumCustom questEnum, Pageable pageable);
     Page<BoardList> findAllByUser(User user, Pageable pageable);
     List<BoardList> findByQuestEnum(BoardEnumCustom questEnum);
+    List<BoardList> findByUser(User user);
 }
