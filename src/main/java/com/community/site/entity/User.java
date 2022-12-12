@@ -38,10 +38,10 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String introduction;
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<BoardList> boardLists = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)

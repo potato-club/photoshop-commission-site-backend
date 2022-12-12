@@ -100,12 +100,12 @@ public class BoardController {
     }
 
 
-    @PutMapping("/list/update")
-
-    public ResponseEntity<String> updateBoard(BoardUpdateRequestDto boardListDto, ImageOpen imageOpen,
-                                          @ApiIgnore HttpServletRequest request,
-                                          @ApiIgnore HttpServletResponse response) {
-        boardService.updateBoard(boardListDto, imageOpen, request, response);
+    @PutMapping("/list/{id}")
+    public ResponseEntity<String> updateBoard(@PathVariable Long id, BoardUpdateRequestDto boardListDto,
+                                              ImageOpen imageOpen,
+                                              @ApiIgnore HttpServletRequest request,
+                                              @ApiIgnore HttpServletResponse response) {
+        boardService.updateBoard(id, boardListDto, imageOpen, request, response);
         return ResponseEntity.ok("게시글이 수정되었습니다.");
     }
 

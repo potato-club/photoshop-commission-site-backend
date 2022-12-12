@@ -13,7 +13,6 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
-
     private final User user;
 
     public User getUser() {

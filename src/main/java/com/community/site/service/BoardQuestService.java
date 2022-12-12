@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.community.site.enumcustom.UserRole.ARTIST;
 import static com.community.site.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
 
 
@@ -84,7 +85,7 @@ public class BoardQuestService {
         BoardList boardList = getBoardList(id);
         User user = getUserByEmail(email);
 
-        if (user.getUserRole() != UserRole.ARTIST) {
+        if (!user.getUserRole().equals(ARTIST)) {
             throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
         } else if(boardList.getRequestList().contains(user.getNickname())) {
             throw new UnAuthorizedException("이미 요청된 상태입니다.", ACCESS_DENIED_EXCEPTION);
