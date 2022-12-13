@@ -47,23 +47,15 @@ public class MyPageService {
 
     @Transactional
     public UserResponseDto viewMyPage(HttpServletRequest request, HttpServletResponse response) {     // 내 정보 보기
-        String token = tokenService.validateAndReissueToken(request, response);
-        String email = jwtTokenProvider.getUserEmail(token);
-
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
-
+        User user = returnUser(request, response);
         UserResponseDto userResponseDto = new UserResponseDto(user);
+
         return userResponseDto;
     }
 
     @Transactional
     public String averageGrade(HttpServletRequest request, HttpServletResponse response) {
-        String token = tokenService.validateAndReissueToken(request, response);
-        String email = jwtTokenProvider.getUserEmail(token);
-
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
+        User user = returnUser(request, response);
 
         return String.format("%.1f", user.getGrade());
     }
@@ -71,24 +63,31 @@ public class MyPageService {
     @Transactional
     public Page<ReviewResponseDto> viewReviewList(HttpServletRequest request, HttpServletResponse response,
                                                   int page) {
-        String token = tokenService.validateAndReissueToken(request, response);
-        String email = jwtTokenProvider.getUserEmail(token);
-
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = returnUser(request, response);
 
         Pageable pageable = PageRequest.of(page - 1, 16);
         Page<Review> reviews = reviewRepository.findByUser(user, pageable);
 
         return new PageImpl<>(reviews.stream().map(ReviewResponseDto::new).collect(Collectors.toList()),
-                pageable, reviews.getTotalPages());
+                pageable, reviews.getSize());
+    }
+
+    @Transactional
+    public Page<ThumbnailResponseDto> viewParticipatedBoardList(HttpServletRequest request, HttpServletResponse response,
+                                           int page) {
+        User user = returnUser(request, response);
+
+        Pageable pageable = PageRequest.of(page - 1, 16);
+        Page<BoardList> boardLists = boardRepository.findBySelectedArtist(user, pageable);
+
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
+                pageable, boardLists.getSize());
     }
 
     @Transactional
     public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request,
                              HttpServletResponse response) {    // 내 정보 업데이트
-        if (!jwtTokenProvider.validateToken(tokenService.validateAndReissueToken(request, response))) {
-            throw new JwtException("다시 로그인 해주시길 바랍니다.");
-        }
+        User user = returnUser(request, response);
 
         UserRequestDto myDto = UserRequestDto.builder()
                 .nickname(userDto.getNickname())
@@ -96,17 +95,13 @@ public class MyPageService {
                 .introduction(userDto.getIntroduction())
                 .build();
 
-        myDto.toEntity();
+        user.update(myDto);
     }
 
     @Transactional
     public void writeReviewAndGrade(ReviewRequestDto requestDto, HttpServletRequest request,
                                     HttpServletResponse response) {
-        String token = tokenService.validateAndReissueToken(request, response);
-        String email = jwtTokenProvider.getUserEmail(token);
-
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
+        User user = returnUser(request, response);
 
         BoardList boardList = boardRepository.findById(requestDto.getRoomId()).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
@@ -127,14 +122,18 @@ public class MyPageService {
 
     @Transactional
     public void resign(HttpServletRequest request, HttpServletResponse response) {    // 회원 탈퇴
-        String token = tokenService.validateAndReissueToken(request, response);
+        User user = returnUser(request, response);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
-        String email = jwtTokenProvider.getUserEmail(token);
-
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-        { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
         userRepository.delete(user);
         redisService.delValues(refreshToken);
+    }
+
+    private User returnUser(HttpServletRequest request, HttpServletResponse response) {
+        String token = tokenService.validateAndReissueToken(request, response);
+        String email = jwtTokenProvider.getUserEmail(token);
+
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return user;
     }
 }

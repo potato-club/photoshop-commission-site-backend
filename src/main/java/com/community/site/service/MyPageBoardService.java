@@ -42,7 +42,7 @@ public class MyPageBoardService {
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .filter(i -> i.getQuestEnum().equals(BEFORE)).collect(Collectors.toList()),
-                pageable, boardLists.getTotalPages());
+                pageable, boardLists.getSize());
     }
 
     @Transactional
@@ -55,7 +55,7 @@ public class MyPageBoardService {
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .filter(i -> i.getQuestEnum().equals(REQUESTING)).collect(Collectors.toList()),
-                pageable, boardLists.getTotalPages());
+                pageable, boardLists.getSize());
     }
 
     @Transactional
@@ -68,7 +68,7 @@ public class MyPageBoardService {
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .filter(i -> i.getQuestEnum().equals(COMPLETE)).collect(Collectors.toList()),
-                pageable, boardLists.getTotalPages());
+                pageable, boardLists.getSize());
     }
 
     @Transactional

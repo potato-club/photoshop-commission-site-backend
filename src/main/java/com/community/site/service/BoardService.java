@@ -50,7 +50,8 @@ public class BoardService {
         Pageable pageable = PageRequest.of(page - 1, 16);
         Page<BoardList> boardLists = boardRepository.findByTitle(keyword, pageable);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
+                pageable, boardLists.getSize());
     }
 
     @Transactional
@@ -59,7 +60,8 @@ public class BoardService {
         Pageable pageable = PageRequest.of(page - 1, 16);
         Page<BoardList> boardLists = boardRepository.findByNickname(keyword, pageable);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()));
+        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
+                pageable, boardLists.getSize());
     }
 
     @Transactional
@@ -81,7 +83,7 @@ public class BoardService {
         Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(BEFORE, pageable);
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.getTotalPages());
+                pageable, boardLists.getSize());
     }
 
     @Transactional
@@ -91,7 +93,7 @@ public class BoardService {
         Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(REQUESTING, pageable);
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.getTotalPages());
+                pageable, boardLists.getSize());
     }
 
     @Transactional
@@ -101,7 +103,7 @@ public class BoardService {
         Page<BoardList> boardLists = boardRepository.findAllByQuestEnum(COMPLETE, pageable);
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.getTotalPages());
+                pageable, boardLists.getSize());
     }
 
     @Transactional

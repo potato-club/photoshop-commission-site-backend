@@ -45,6 +45,13 @@ public class MyPageController {
         return myPageService.averageGrade(request, response);
     }
 
+    @GetMapping("/mypage/participate")
+    public Page<ThumbnailResponseDto> viewParticipatedBoardList(@ApiIgnore HttpServletRequest request,
+                                            @ApiIgnore HttpServletResponse response,
+                                            @RequestParam("page") int page) {
+        return myPageService.viewParticipatedBoardList(request, response, page);
+    }
+
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userDto", value = "업데이트 값", required = true,
                     dataType = "Object", paramType = "query")
