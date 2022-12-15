@@ -31,6 +31,12 @@ public class BoardQuestController {
         return ResponseEntity.ok("리스트에 등록됨");
     }
 
+    @PutMapping("/list/{id}/request")
+    public ResponseEntity<String> exceptQuest(@PathVariable Long id, HttpServletRequest request) {
+        boardQuestService.exceptQuest(id, request);
+        return ResponseEntity.ok("리스트에서 제거됨");
+    }
+
     @PostMapping("/list/{id}/artist")
     public ResponseEntity<String> chooseArtist(@PathVariable Long id, @RequestBody UserNicknameDto artistDto,
                                                HttpServletRequest request) {

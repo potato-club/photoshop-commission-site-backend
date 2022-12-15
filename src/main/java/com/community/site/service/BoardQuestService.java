@@ -6,7 +6,6 @@ import com.community.site.dto.UserDto.UserNicknameDto;
 import com.community.site.entity.BoardList;
 import com.community.site.entity.User;
 import com.community.site.enumcustom.BoardEnumCustom;
-import com.community.site.enumcustom.UserRole;
 import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -91,7 +89,22 @@ public class BoardQuestService {
             throw new UnAuthorizedException("이미 요청된 상태입니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        boardList.updateAcceptQuest(user.getNickname());
+        boardList.addAcceptQuest(user.getNickname());
+    }
+
+    @Transactional
+    public void exceptQuest(Long id, HttpServletRequest request) {
+        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.resolveAccessToken(request));
+        BoardList boardList = getBoardList(id);
+        User user = getUserByEmail(email);
+
+        if (!user.getUserRole().equals(ARTIST)) {
+            throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
+        } else if(!boardList.getRequestList().contains(user.getNickname())) {
+            throw new UnAuthorizedException("요청하지 않은 상태입니다.", ACCESS_DENIED_EXCEPTION);
+        }
+
+        boardList.removeAcceptQuest(user.getNickname());
     }
 
     @Transactional

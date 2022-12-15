@@ -81,8 +81,12 @@ public class BoardList {
         this.context = boardUpdateRequestDto.getContext();
     }
 
-    public void updateAcceptQuest(String userNickname) {
+    public void addAcceptQuest(String userNickname) {
         this.requestList.add(userNickname);
+    }
+
+    public void removeAcceptQuest(String userNickname) {
+        this.requestList.remove(userNickname);
     }
 
     public void choiceArtist(User selectedArtist, BoardEnumCustom questEnum) {
