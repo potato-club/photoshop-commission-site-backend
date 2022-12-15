@@ -1,6 +1,7 @@
 package com.community.site.controller;
 
 import com.community.site.dto.JwtDto.TokenResponse;
+import com.community.site.dto.UserDto.TestRequestDto;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserRequestDto;
 import com.community.site.dto.UserDto.UserResponseDto;
@@ -66,8 +67,8 @@ public class LoginController {
     }
 
     @PostMapping("/create/token")
-    public TokenResponse createToken(@RequestBody UserRequestDto userRequestDto, HttpServletResponse response) {
-        return loginService.createToken(userRequestDto, response);
+    public TokenResponse createToken(@RequestBody TestRequestDto testRequestDto, HttpServletResponse response) {
+        return loginService.createToken(testRequestDto, response);
     }
 
     @PutMapping("/resolver/token")

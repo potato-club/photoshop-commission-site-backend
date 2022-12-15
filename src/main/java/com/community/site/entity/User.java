@@ -38,6 +38,9 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String introduction;
 
+    @Column
+    private Double grade;   // 평균 별점
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<BoardList> boardLists = new ArrayList<>();
 
@@ -52,5 +55,9 @@ public class User extends BaseTimeEntity {
         this.nickname = userDto.getNickname();
         this.userRole = userDto.getUserRole();
         this.introduction = userDto.getIntroduction();
+    }
+
+    public void updateAverageGrade(Double grade) {
+        this.grade = grade;
     }
 }
