@@ -1,9 +1,6 @@
 package com.community.site.error;
 
-import com.community.site.error.exception.BadRequestException;
-import com.community.site.error.exception.InternerServerException;
-import com.community.site.error.exception.NotFoundException;
-import com.community.site.error.exception.UnAuthorizedException;
+import com.community.site.error.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +36,16 @@ public class ErrorExceptionControllerAdvice {
 
     @ExceptionHandler({NotFoundException.class})
     public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final NotFoundException e) {
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorEntity.builder()
+                        .errorCode(e.getErrorCode().getCode())
+                        .errorMessage(e.getErrorCode().getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler({DuplicateException.class})
+    public ResponseEntity<ErrorEntity> exceptionHandler(HttpServletRequest request, final DuplicateException e) {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorEntity.builder()

@@ -12,7 +12,8 @@ public enum ErrorCode {
     ACCESS_DENIED_EXCEPTION(HttpStatus.UNAUTHORIZED, "E0002", "401 UnAuthorized"),
     FORBIDDEN_EXCEPTION(HttpStatus.FORBIDDEN, "E0003", "403 Forbidden"),
     NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "E0004", "404 Not Found"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E0005", "500 Internal Server Error");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E0005", "500 Internal Server Error"),
+    CONFLICT_EXCEPTION(HttpStatus.CONFLICT, "E0006", "409 Conflict");
 
     private final HttpStatus status;
     private final String code;
