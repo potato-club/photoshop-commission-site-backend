@@ -8,15 +8,15 @@ import com.community.site.entity.User;
 import com.community.site.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Id;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,8 +76,10 @@ public class MyPageBoardService {
 
         User user = returnUser(request, response);
         List<BoardList> boardLists = boardRepository.findByUser(user);
+        boardLists.sort(Comparator.comparingLong(BoardList::getId));
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
+                .filter(i -> i.getQuestEnum().equals(BEFORE)).collect(Collectors.toList());
     }
 
     @Transactional
@@ -86,7 +88,8 @@ public class MyPageBoardService {
         User user = returnUser(request, response);
         List<BoardList> boardLists = boardRepository.findByUser(user);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
+                .filter(i -> i.getQuestEnum().equals(REQUESTING)).collect(Collectors.toList());
     }
 
     @Transactional
@@ -95,7 +98,8 @@ public class MyPageBoardService {
         User user = returnUser(request, response);
         List<BoardList> boardLists = boardRepository.findByUser(user);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
+                .filter(i -> i.getQuestEnum().equals(COMPLETE)).collect(Collectors.toList());
     }
 
     private User returnUser(HttpServletRequest request, HttpServletResponse response) {

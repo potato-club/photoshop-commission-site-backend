@@ -13,10 +13,7 @@ import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -25,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,6 +108,7 @@ public class BoardService {
     public List<ThumbnailResponseDto> getBeforeBoardList() {
 
         List<BoardList> boardLists = boardRepository.findByQuestEnum(BEFORE);
+        boardLists.sort(Comparator.comparingLong(BoardList::getId));
 
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
