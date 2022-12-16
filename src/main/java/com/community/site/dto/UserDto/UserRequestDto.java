@@ -7,6 +7,8 @@ import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Builder
 @Data
@@ -28,11 +30,23 @@ public class UserRequestDto {
     @ApiModelProperty(value="유저 역할", example = "ARTIST", required = true)
     private UserRole userRole;
 
+    @ApiModelProperty(value="생성 시간", example = "yyyy.MM.dd", hidden = true)
+    private String createdDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+
+    @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd", hidden = true)
+    private String modifiedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+
+    @ApiModelProperty(value="기본 평점", example = "0", hidden = true)
+    private Double grade;
+
     public User toEntity() {
         User user = User.builder()
                 .nickname(nickname)
                 .introduction(introduction)
                 .userRole(userRole)
+                .createdDate(createdDate)
+                .modifiedDate(modifiedDate)
+                .grade(grade)
                 .build();
 
         return user;

@@ -1,11 +1,15 @@
 package com.community.site.entity;
 
+import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserRequestDto;
 import com.community.site.enumcustom.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import javax.persistence.*;
 
 import java.util.ArrayList;
@@ -19,11 +23,19 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Builder
 @Getter
 @Table(name = "users")
-public class User extends BaseTimeEntity {
+public class User {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
+    @Column(name = "created_date")
+    @CreatedDate
+    private String createdDate;
+
+    @Column(name = "modified_date")
+    @LastModifiedDate
+    private String modifiedDate;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -39,7 +51,7 @@ public class User extends BaseTimeEntity {
     private String introduction;
 
     @Column
-    private Double grade;   // 평균 별점
+    private Double grade;   // 평균 평점
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<BoardList> boardLists = new ArrayList<>();
@@ -55,6 +67,14 @@ public class User extends BaseTimeEntity {
         this.nickname = userDto.getNickname();
         this.userRole = userDto.getUserRole();
         this.introduction = userDto.getIntroduction();
+        this.modifiedDate = userDto.getModifiedDate();
+    }
+
+    public void updateMyPage(UserMyPageRequestDto userDto) {
+        this.nickname = userDto.getNickname();
+        this.userRole = userDto.getUserRole();
+        this.introduction = userDto.getIntroduction();
+        this.modifiedDate = userDto.getModifiedDate();
     }
 
     public void updateAverageGrade(Double grade) {

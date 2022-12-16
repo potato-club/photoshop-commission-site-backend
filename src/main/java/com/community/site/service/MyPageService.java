@@ -19,10 +19,7 @@ import com.community.site.service.Jwt.RedisService;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,14 +85,7 @@ public class MyPageService {
     public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request,
                              HttpServletResponse response) {    // 내 정보 업데이트
         User user = returnUser(request, response);
-
-        UserRequestDto myDto = UserRequestDto.builder()
-                .nickname(userDto.getNickname())
-                .userRole(userDto.getUserRole())
-                .introduction(userDto.getIntroduction())
-                .build();
-
-        user.update(myDto);
+        user.updateMyPage(userDto);
     }
 
     @Transactional
@@ -106,16 +96,19 @@ public class MyPageService {
         BoardList boardList = boardRepository.findById(requestDto.getRoomId()).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
-        requestDto.builder()
-                .nickname(user.getNickname())
-                .user(boardList.getSelectedArtist())
-                .boardList(boardList)
-                .build();
-
         List<Review> averageGrade = reviewRepository.findAllByUser(boardList.getSelectedArtist());
         Double averageSum = averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() / averageGrade.size();
 
-        reviewRepository.save(requestDto.toEntity());
+        reviewRepository.save(requestDto.builder()
+                .roomId(requestDto.getRoomId())
+                .content(requestDto.getContent())
+                .grade(requestDto.getGrade())
+                .nickname(user.getNickname())
+                .user(boardList.getSelectedArtist())
+                .boardList(boardList)
+                .createdDate(requestDto.getCreatedDate())
+                .build().toEntity());
+
         boardList.changeQuestEnum(COMPLETE);
         user.updateAverageGrade(averageSum);
     }

@@ -23,7 +23,7 @@ public class UserResponseDto implements Serializable {
         this.email = user.getEmail();
         this.introduction = user.getIntroduction();
         this.userRole = user.getUserRole();
-        this.createdDate = user.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        this.createdDate = String.valueOf(user.getCreatedDate());
         this.grade =  String.format("%.1f", user.getGrade());
     }
 }
