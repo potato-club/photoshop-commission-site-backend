@@ -2,6 +2,8 @@ package com.community.site.service;
 
 import com.community.site.Repository.BoardRepository;
 import com.community.site.Repository.UserRepository;
+import com.community.site.entity.BoardList;
+import com.community.site.entity.User;
 import com.community.site.enumcustom.UserRole;
 import com.community.site.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
@@ -30,6 +32,8 @@ public class TokenService {
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
+        if (accessToken == null && refreshToken == null) { return "guest"; }
+
         boolean isRefreshToken = jwtTokenProvider.existsRefreshToken(refreshToken);
         boolean checkAccessToken = jwtTokenProvider.validateToken(accessToken);
         boolean checkRefreshToken = jwtTokenProvider.validateToken(refreshToken);
@@ -42,7 +46,7 @@ public class TokenService {
                 jwtTokenProvider.setHeaderAccessToken(response, newAccessToken);
                 return newAccessToken;
             }
-        } else {
+        } else if(!checkRefreshToken) {
             throw new JwtException("다시 로그인 해주세요.");
         }
 
@@ -79,5 +83,21 @@ public class TokenService {
         UserRole userEnum = userRepository.getByEmail(email).getUserRole();
 
         return userEnum;
+    }
+
+    @Transactional
+    public boolean checkSelectedArtist(Long id, HttpServletRequest request, HttpServletResponse response) {
+
+        String accessToken = validateAndReissueToken(request, response);
+        String email = jwtTokenProvider.getUserEmail(accessToken);
+
+        User user = userRepository.findByEmail(email).orElseThrow();
+        BoardList boardList = boardRepository.findById(id).orElseThrow();
+
+        if (boardList.getSelectedArtist().getNickname().equals(user.getNickname())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

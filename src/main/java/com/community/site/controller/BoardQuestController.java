@@ -1,5 +1,6 @@
 package com.community.site.controller;
 
+import com.community.site.dto.BoardDto.BoardOutputResponseDto;
 import com.community.site.dto.UserDto.UserNicknameDto;
 import com.community.site.service.BoardQuestService;
 import io.swagger.annotations.Api;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,5 +48,18 @@ public class BoardQuestController {
                                                HttpServletRequest request, HttpServletResponse response) {
         boardQuestService.chooseArtist(id, artistDto, request, response);
         return ResponseEntity.ok("ARTIST 선택 완료");
+    }
+
+    @PostMapping("/list/{id}/upload")
+    public ResponseEntity<String> uploadOutput(@PathVariable Long id, List<MultipartFile> image,
+                                               HttpServletRequest request, HttpServletResponse response) {
+        boardQuestService.uploadOutput(id, image, request, response);
+        return ResponseEntity.ok("결과물 업로드 완료");
+    }
+
+    @GetMapping("/list/{id}/output")
+    public BoardOutputResponseDto viewOutputs(@PathVariable Long id, HttpServletRequest request,
+                                                     HttpServletResponse response) {
+        return boardQuestService.viewOutputs(id, request, response);
     }
 }

@@ -49,7 +49,7 @@ public class LoginService {
         MultiValueMap<String, Object> sessionCarrier = new LinkedMultiValueMap<>();
 
         User user = userRepository.findByNickname(userDto.getSerialCode());
-        userDto.setGrade((double) 0);
+        userDto.setGrade(0.0);
         user.update(userDto);
 
         user = userRepository.findByNickname(userDto.getNickname());
@@ -134,7 +134,7 @@ public class LoginService {
                 .nickname(testRequestDto.getNickname())
                 .createdDate(testRequestDto.getCreatedDate())
                 .modifiedDate(testRequestDto.getModifiedDate())
-                .grade((double) 0)
+                .grade(0.0)
                 .build();
 
         userRepository.save(user);

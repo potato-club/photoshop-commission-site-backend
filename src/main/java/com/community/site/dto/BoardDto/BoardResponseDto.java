@@ -32,7 +32,7 @@ public class BoardResponseDto {
     private List<CommentResponseDto> comments;
     private List<FileResponseDto> image;
 
-    public BoardResponseDto(BoardList boardList) {
+    public BoardResponseDto(BoardList boardList, String nickname) {
         this.id = boardList.getId();
         this.createdDate = boardList.getCreatedDate();
         this.modifiedDate = boardList.getModifiedDate();
@@ -43,7 +43,9 @@ public class BoardResponseDto {
         this.context = boardList.getContext();
         this.comments = boardList.getComments().stream().map(CommentResponseDto::new)
                 .filter(comments -> comments.isParent()).collect(Collectors.toList());
-        if (boardList.getImageOpen() == OPEN) {
+        if (boardList.getImageOpen() == OPEN || boardList.getNickname().equals(nickname)) {
+            this.image = boardList.getImage().stream().map(FileResponseDto::new).collect(Collectors.toList());
+        } else if(boardList.getSelectedArtist() != null && boardList.getSelectedArtist().getNickname().equals(nickname)) {
             this.image = boardList.getImage().stream().map(FileResponseDto::new).collect(Collectors.toList());
         }
     }

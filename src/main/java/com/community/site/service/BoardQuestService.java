@@ -1,14 +1,19 @@
 package com.community.site.service;
 
 import com.community.site.Repository.BoardRepository;
+import com.community.site.Repository.OutputRepository.OutputRepository;
 import com.community.site.Repository.UserRepository;
+import com.community.site.dto.BoardDto.BoardOutputResponseDto;
 import com.community.site.dto.UserDto.UserNicknameDto;
 import com.community.site.entity.BoardList;
+import com.community.site.entity.Output;
 import com.community.site.entity.User;
 import com.community.site.enumcustom.BoardEnumCustom;
 import com.community.site.error.exception.DuplicateException;
 import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
+import com.community.site.service.S3.S3UploadService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,12 +22,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.community.site.enumcustom.UserRole.ARTIST;
@@ -40,6 +46,9 @@ public class BoardQuestService {
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final OutputRepository outputRepository;
+    private final S3UploadService s3UploadService;
+    private String nickname;
 
     private BoardList getBoardList(Long id) {
         return boardRepository.findById(id).orElseThrow(() ->
@@ -127,5 +136,53 @@ public class BoardQuestService {
         }
 
         boardList.choiceArtist(artist, BoardEnumCustom.REQUESTING);
+    }
+
+    @Transactional
+    public void uploadOutput(Long id, List<MultipartFile> image,
+                             HttpServletRequest request, HttpServletResponse response) {
+        User user = getUserByToken(request, response);
+        BoardList boardList = getBoardList(id);
+
+        if (user.getNickname().equals(boardList.getSelectedArtist().getNickname())) {
+            uploadBoardListOutput(image, boardList);
+        } else {
+            throw new JwtException("연결된 디자이너가 아닙니다.");
+        }
+    }
+
+    @Transactional
+    public BoardOutputResponseDto viewOutputs(Long id, HttpServletRequest request,
+                                         HttpServletResponse response) {
+        BoardList boardList = getBoardList(id);
+        String accessToken = tokenService.validateAndReissueToken(request, response);
+
+        if (accessToken.equals("guest")) {
+            nickname = "GUEST";
+        } else {
+            String email = jwtTokenProvider.getUserEmail(accessToken);
+            User user = userRepository.findByEmail(email).orElseThrow();
+
+            nickname = user.getNickname();
+        }
+
+        BoardOutputResponseDto responseDto = new BoardOutputResponseDto(boardList, nickname);
+        return responseDto;
+    }
+
+    private List<String> uploadBoardListOutput(List<MultipartFile> image, BoardList boardList) {
+        return image.stream()
+                .map(file -> s3UploadService.uploadFile(file))
+                .map(url -> createFile(boardList, url))
+                .map(file -> file.getFileUrl())
+                .collect(Collectors.toList());
+    }
+
+    private Output createFile(BoardList boardList, String url) {
+        return outputRepository.save(Output.builder()
+                .fileUrl(url)
+                .fileName(StringUtils.getFilename(url))
+                .boardList(boardList)
+                .build());
     }
 }

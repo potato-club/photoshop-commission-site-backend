@@ -31,4 +31,11 @@ public class TokenController {
     public UserRole checkEnum(@ApiIgnore HttpServletRequest request, @ApiIgnore HttpServletResponse response) {
         return tokenService.checkEnum(request, response);
     }
+
+    @GetMapping("/check/{id}/artist")
+    public boolean checkSelectedArtist(@PathVariable Long id,
+                                        @ApiIgnore HttpServletRequest request,
+                                        @ApiIgnore HttpServletResponse response) {
+        return tokenService.checkSelectedArtist(id, request, response);
+    }
 }

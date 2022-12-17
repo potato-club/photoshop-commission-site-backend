@@ -63,8 +63,10 @@ public class BoardController {
     }
 
     @GetMapping("/list/{id}")
-    public BoardResponseDto findBoardList(@PathVariable Long id) {
-        return boardService.findBoardList(id);
+    public BoardResponseDto findBoardList(@PathVariable Long id,
+                                          @ApiIgnore HttpServletRequest request,
+                                          @ApiIgnore HttpServletResponse response) {
+        return boardService.findBoardList(id, request, response);
     }
 
     @ApiImplicitParams({
@@ -92,11 +94,12 @@ public class BoardController {
                     dataType = "List<MultipartFile>", paramType = "query")
     })
     @PostMapping("/list/create")
-    public UploadFileResponse createBoard(List<MultipartFile> image, ImageOpen imageOpen,
+    public ResponseEntity<String> createBoard(List<MultipartFile> image, ImageOpen imageOpen,
                                           BoardRequestDto boardListDto,
                                           @ApiIgnore HttpServletRequest request,
                                           @ApiIgnore HttpServletResponse response) {
-        return boardService.createBoard(image, imageOpen, boardListDto, request, response);
+        boardService.createBoard(image, imageOpen, boardListDto, request, response);
+        return ResponseEntity.ok("게시글이 생성되었습니다.");
     }
 
 

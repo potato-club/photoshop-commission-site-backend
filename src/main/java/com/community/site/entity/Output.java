@@ -1,18 +1,23 @@
 package com.community.site.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 
-@Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "files")
-public class File {
+@AllArgsConstructor
+@Builder
+@Getter
+@Table(name = "outputs")
+public class Output {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +35,7 @@ public class File {
     private BoardList boardList;
 
     @Builder
-    public File(String fileName, String fileUrl, BoardList boardList) {
+    public Output(String fileName, String fileUrl, BoardList boardList) {
         this.fileName = fileName;
         this.fileUrl = fileUrl;
         this.boardList = boardList;

@@ -24,6 +24,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        if (request.getHeader("authorization") == null && request.getHeader("refreshToken") == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         // 헤더에서 JWT 를 받아옵니다.
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);

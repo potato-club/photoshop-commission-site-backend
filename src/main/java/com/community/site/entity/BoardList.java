@@ -74,6 +74,9 @@ public class BoardList {
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
     private List<File> image = new ArrayList<>();
 
+    @OneToMany(mappedBy = "boardList", orphanRemoval = true)
+    private List<Output> outputs = new ArrayList<>();
+
     public void update(BoardUpdateRequestDto boardUpdateRequestDto) {
         this.modifiedDate = boardUpdateRequestDto.getModifiedDate();
         this.title = boardUpdateRequestDto.getTitle();

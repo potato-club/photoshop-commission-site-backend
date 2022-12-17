@@ -41,6 +41,7 @@ public class BoardService {
     private final FileRepository fileRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenService tokenService;
+    private String nickname;
 
     @Transactional
     public Page<ThumbnailResponseDto> getTitleBoardList(String keyword, int page) {
@@ -63,13 +64,22 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponseDto findBoardList(Long id) {
-        if (boardRepository.getById(id).equals("")) {
-            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+    public BoardResponseDto findBoardList(Long id, HttpServletRequest request,
+                                          HttpServletResponse response) {
+
+        String token = tokenService.validateAndReissueToken(request, response);
+
+        if (token.equals("guest")) {
+            nickname = "GUEST";
+        } else {
+            String email = jwtTokenProvider.getUserEmail(token);
+            User user = userRepository.findByEmail(email).orElseThrow();
+
+            nickname = user.getNickname();
         }
 
         BoardList boardLists = boardRepository.findById(id).orElseThrow();
-        BoardResponseDto boardResponseDto = new BoardResponseDto(boardLists);
+        BoardResponseDto boardResponseDto = new BoardResponseDto(boardLists, nickname);
 
         return boardResponseDto;
     }
@@ -130,7 +140,7 @@ public class BoardService {
     }
 
     @Transactional
-    public UploadFileResponse createBoard(List<MultipartFile> image, ImageOpen imageOpen,
+    public void createBoard(List<MultipartFile> image, ImageOpen imageOpen,
                                           BoardRequestDto boardListDto,
                                           HttpServletRequest request,
                                           HttpServletResponse response) {
@@ -148,17 +158,7 @@ public class BoardService {
         BoardList boardList = boardListDto.toEntity();
         boardRepository.save(boardList);
 
-        List<String> downloadLink = uploadBoardListFile(image, boardList);
-        List<String> downloadUri = new ArrayList<>();
-
-        for(String Link : downloadLink) {
-            File file = fileRepository.findByFileUrl(Link);
-            downloadUri.add(file.getFileName());
-        }
-
-        UploadFileResponse uploadFileResponse = new UploadFileResponse(boardList.getId(), downloadUri);
-
-        return uploadFileResponse;
+        uploadBoardListFile(image, boardList);
     }
 
     private List<String> uploadBoardListFile(List<MultipartFile> image, BoardList boardList) {
