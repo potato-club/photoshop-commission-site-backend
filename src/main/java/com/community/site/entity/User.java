@@ -67,7 +67,9 @@ public class User {
         this.nickname = userDto.getNickname();
         this.userRole = userDto.getUserRole();
         this.introduction = userDto.getIntroduction();
+        this.createdDate = userDto.getCreatedDate();
         this.modifiedDate = userDto.getModifiedDate();
+        this.grade = userDto.getGrade();
     }
 
     public void updateMyPage(UserMyPageRequestDto userDto) {

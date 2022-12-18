@@ -33,6 +33,5 @@ public class CommentRequestDto {
 
     @ApiModelProperty(value="게시글 정보", example = "board_list_id", hidden = true)
     private BoardList boardList;
-
 }
 
