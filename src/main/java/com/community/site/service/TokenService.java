@@ -94,7 +94,7 @@ public class TokenService {
         User user = userRepository.findByEmail(email).orElseThrow();
         BoardList boardList = boardRepository.findById(id).orElseThrow();
 
-        if (boardList.getSelectedArtist().getNickname().equals(user.getNickname())) {
+        if (boardList.getSelectedArtist() != null && boardList.getSelectedArtist().getNickname().equals(user.getNickname())) {
             return true;
         } else {
             return false;
