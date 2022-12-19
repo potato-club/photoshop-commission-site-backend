@@ -7,7 +7,6 @@ import com.community.site.dto.BoardDto.ThumbnailResponseDto;
 import com.community.site.dto.ReviewDto.ReviewRequestDto;
 import com.community.site.dto.ReviewDto.ReviewResponseDto;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
-import com.community.site.dto.UserDto.UserRequestDto;
 import com.community.site.dto.UserDto.UserResponseDto;
 import com.community.site.entity.BoardList;
 import com.community.site.entity.Review;
@@ -16,7 +15,6 @@ import com.community.site.error.ErrorCode;
 import com.community.site.error.exception.UnAuthorizedException;
 import com.community.site.jwt.JwtTokenProvider;
 import com.community.site.service.Jwt.RedisService;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -25,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,10 +80,30 @@ public class MyPageService {
                 pageable, boardLists.getSize());
     }
 
+    // 내 정보 업데이트
     @Transactional
     public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request,
-                             HttpServletResponse response) {    // 내 정보 업데이트
+                             HttpServletResponse response) throws IllegalAccessException {
+
         User user = returnUser(request, response);
+
+        for (Field field : UserMyPageRequestDto.class.getDeclaredFields()) {
+            field.setAccessible(true);
+            Object value = field.get(userDto);
+            if (value == null) {
+                try {
+                    Field userField = User.class.getDeclaredField(field.getName());
+                    userField.setAccessible(true);
+                    Object userValue = userField.get(user);
+                    field.set(userDto, userValue);
+                } catch (IllegalAccessException e) {
+                    log.error("Error setting field value: {}", e.getMessage());
+                } catch (NoSuchFieldException e) {
+                    log.error("Error getting field: {}", e.getMessage());
+                }
+            }
+        }
+
         user.updateMyPage(userDto);
     }
 

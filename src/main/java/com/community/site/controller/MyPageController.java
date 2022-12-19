@@ -18,6 +18,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 
 @RestController
 @Slf4j
@@ -59,7 +60,7 @@ public class MyPageController {
     @PutMapping("/mypage/update")
     public ResponseEntity<String> updateMyPage(@RequestBody UserMyPageRequestDto userDto,
                                                @ApiIgnore HttpServletRequest request,
-                                               @ApiIgnore HttpServletResponse response) {
+                                               @ApiIgnore HttpServletResponse response) throws IllegalAccessException {
         myPageService.updateMyPage(userDto, request, response);
         return ResponseEntity.ok("회원정보가 수정되었습니다.");
     }

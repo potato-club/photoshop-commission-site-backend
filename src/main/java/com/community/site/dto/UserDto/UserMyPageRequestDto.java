@@ -30,17 +30,6 @@ public class UserMyPageRequestDto {
     @ApiModelProperty(value="유저 역할", example = "ARTIST", required = true)
     private UserRole userRole;
 
-    @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd", hidden = true)
-    private String modifiedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-
-    public User toEntity() {
-        User user = User.builder()
-                .nickname(nickname)
-                .introduction(introduction)
-                .userRole(userRole)
-                .modifiedDate(modifiedDate)
-                .build();
-
-        return user;
-    }
+    @ApiModelProperty(value="수정 시간", example = "yyyy-MM-dd", hidden = true)
+    private String modifiedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 }

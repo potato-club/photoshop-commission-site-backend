@@ -30,11 +30,11 @@ public class UserRequestDto {
     @ApiModelProperty(value="유저 역할", example = "ARTIST", required = true)
     private UserRole userRole;
 
-    @ApiModelProperty(value="생성 시간", example = "yyyy.MM.dd", hidden = true)
-    private String createdDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    @ApiModelProperty(value="생성 시간", example = "yyyy-MM-dd", hidden = true)
+    private String createdDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-    @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd", hidden = true)
-    private String modifiedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    @ApiModelProperty(value="수정 시간", example = "yyyy-MM-dd", hidden = true)
+    private String modifiedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
     @ApiModelProperty(value="기본 평점", example = "0", hidden = true)
     private Double grade;
