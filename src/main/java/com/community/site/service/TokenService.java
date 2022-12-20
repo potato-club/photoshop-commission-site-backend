@@ -27,7 +27,7 @@ public class TokenService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
 
-    @Transactional
+    @Transactional  // 토큰 검증 및 accessToken 만료 시 재발급해주는 기능을 가지고 있다.
     public String validateAndReissueToken(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
@@ -53,7 +53,7 @@ public class TokenService {
         return accessToken;
     }
 
-    @Transactional
+    @Transactional  // 의뢰자가 맞는지 확인하는 기능이다.
     public boolean checkWriter(Long id, HttpServletRequest request, HttpServletResponse response) {
         if (request.getHeader("authorization") == null) {
             return false;
@@ -71,7 +71,7 @@ public class TokenService {
         }
     }
 
-    @Transactional
+    @Transactional  // 토큰으로 해당 유저의 Enum 타입을 조회할 수 있는 기능이다.
     public UserRole checkEnum(HttpServletRequest request, HttpServletResponse response) {
         if (request.getHeader("authorization") == null) {
             return GUEST;
@@ -85,7 +85,7 @@ public class TokenService {
         return userEnum;
     }
 
-    @Transactional
+    @Transactional  // 토큰을 통해 해당 유저가 이 의뢰를 수주받은 ARTIST인지 판별하는 기능이다.
     public boolean checkSelectedArtist(Long id, HttpServletRequest request, HttpServletResponse response) {
 
         String accessToken = validateAndReissueToken(request, response);

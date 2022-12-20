@@ -38,11 +38,11 @@ public class BoardList {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private BoardEnumCustom questEnum;
+    private BoardEnumCustom questEnum;  // 의뢰 진행 상태 설정용 Enum
 
     @Column
     @Enumerated(EnumType.STRING)
-    private ImageOpen imageOpen;
+    private ImageOpen imageOpen;    // 사진 공개, 비공개 설정용 Enum
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String context;
@@ -61,7 +61,7 @@ public class BoardList {
 
     @OneToOne
     @JoinColumn(name = "selected_artist")
-    private User selectedArtist;
+    private User selectedArtist;    // 의뢰자가 선택한 ARTIST
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Builder.Default

@@ -50,15 +50,15 @@ public class BoardQuestService {
     private final S3UploadService s3UploadService;
     private String nickname;
 
-    private BoardList getBoardList(Long id) {
+    private BoardList getBoardList(Long id) {   // 공통된 부분이 많아 따로 빼놓은 기능이다. BoardList를 반환한다.
         return boardRepository.findById(id).orElseThrow(() ->
         {
             throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
         });
     }
 
-    @Transactional
-    public User getUserByToken(HttpServletRequest request,
+    // 토큰 검증 및 accessToken 만료 시 재발급해주며 이 토큰값으로 email을 추출하여 User 값을 반환하는 기능이다.
+    private User getUserByToken(HttpServletRequest request,
                                 HttpServletResponse response) {
         String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);
@@ -68,6 +68,7 @@ public class BoardQuestService {
         });
     }
 
+    // Pagenation 처리 로직을 공통화하기 위해 만든 기능이다.
     private Page<UserNicknameDto> pagingList(int page, List<UserNicknameDto> requestList) {
         Pageable pageable = PageRequest.of(page - 1, 5);
 
@@ -77,7 +78,7 @@ public class BoardQuestService {
         return new PageImpl<>(requestList.subList(start, end), pageable, requestList.size());
     }
 
-    @Transactional
+    @Transactional  // 신청한 ARTIST 목록을 띄워주는 기능이다.
     public Page<UserNicknameDto> getRequestUserList(Long id, int page, HttpServletRequest request,
                                                     HttpServletResponse response) {
         BoardList boardList = getBoardList(id);
@@ -94,7 +95,7 @@ public class BoardQuestService {
         return pagingList(page, requestList);
     }
 
-    @Transactional
+    @Transactional  // ARTIST가 의뢰 수락을 하기 위한 기능이다.
     public void acceptQuest(Long id, HttpServletRequest request,
                             HttpServletResponse response) {
         BoardList boardList = getBoardList(id);
@@ -109,7 +110,7 @@ public class BoardQuestService {
         boardList.addAcceptQuest(user.getNickname());
     }
 
-    @Transactional
+    @Transactional  // ARTIST 유저가 신청한 의뢰를 취소하기 위한 기능이다.
     public void exceptQuest(Long id, HttpServletRequest request,
                             HttpServletResponse response) {
         BoardList boardList = getBoardList(id);
@@ -124,7 +125,7 @@ public class BoardQuestService {
         boardList.removeAcceptQuest(user.getNickname());
     }
 
-    @Transactional
+    @Transactional  // 의뢰자가 ARTIST 리스트 중에서 한 사람을 정할 때 쓰는 기능이다.
     public void chooseArtist(Long id, UserNicknameDto artistDto, HttpServletRequest request,
                              HttpServletResponse response) {
         User artist = userRepository.findByNickname(artistDto.getNickname());
@@ -138,7 +139,7 @@ public class BoardQuestService {
         boardList.choiceArtist(artist, BoardEnumCustom.REQUESTING);
     }
 
-    @Transactional
+    @Transactional  // 작업 결과물을 저장할 때 쓰는 기능이다.
     public void uploadOutput(Long id, List<MultipartFile> image,
                              HttpServletRequest request, HttpServletResponse response) {
         User user = getUserByToken(request, response);
@@ -151,7 +152,7 @@ public class BoardQuestService {
         }
     }
 
-    @Transactional
+    @Transactional  // 올린 작업 결과물을 보여주는 기능이다.
     public BoardOutputResponseDto viewOutputs(Long id, HttpServletRequest request,
                                          HttpServletResponse response) {
         BoardList boardList = getBoardList(id);

@@ -41,7 +41,7 @@ public class MyPageService {
     private final RedisService redisService;
     private final TokenService tokenService;
 
-    @Transactional
+    @Transactional  // 마이페이지에서 자신의 정보를 불러온다.
     public UserResponseDto viewMyPage(HttpServletRequest request, HttpServletResponse response) {     // 내 정보 보기
         User user = returnUser(request, response);
         UserResponseDto userResponseDto = new UserResponseDto(user);
@@ -49,14 +49,14 @@ public class MyPageService {
         return userResponseDto;
     }
 
-    @Transactional
+    @Transactional  // User 엔티티에 저장된 평균 평점을 불러온다.
     public String averageGrade(HttpServletRequest request, HttpServletResponse response) {
         User user = returnUser(request, response);
 
         return String.format("%.1f", user.getGrade());
     }
 
-    @Transactional
+    @Transactional  // 작성된 후기들을 볼 수 있다. (ARTIST 관점)
     public Page<ReviewResponseDto> viewReviewList(HttpServletRequest request, HttpServletResponse response,
                                                   int page) {
         User user = returnUser(request, response);
@@ -68,7 +68,7 @@ public class MyPageService {
                 pageable, reviews.getSize());
     }
 
-    @Transactional
+    @Transactional  // 자신의 Enum이 ARTIST일 때 의뢰를 수주한 게시글들을 출력해준다.
     public Page<ThumbnailResponseDto> viewParticipatedBoardList(HttpServletRequest request, HttpServletResponse response,
                                            int page) {
         User user = returnUser(request, response);
@@ -81,12 +81,16 @@ public class MyPageService {
     }
 
     // 내 정보 업데이트
-    @Transactional
+    @Transactional  // 마이페이지 정보를 수정한다.
     public void updateMyPage(UserMyPageRequestDto userDto, HttpServletRequest request,
                              HttpServletResponse response) throws IllegalAccessException {
 
         User user = returnUser(request, response);
 
+        /*
+         클라이언트로부터 받은 UserMyPageRequestDto의 컬럼 값들이 null인지 아닌지를 구분하여
+         null일 시 기존 User 엔티티의 해당 컬럼 값을 넣어 한번에 update 시키고자 사용했다.
+         */
         for (Field field : UserMyPageRequestDto.class.getDeclaredFields()) {
             field.setAccessible(true);
             Object value = field.get(userDto);
@@ -107,7 +111,7 @@ public class MyPageService {
         user.updateMyPage(userDto);
     }
 
-    @Transactional
+    @Transactional  // 리뷰와 평점을 작성하고 게시글 Enum을 COMPLETE로 바꾼다.
     public void writeReviewAndGrade(ReviewRequestDto requestDto, HttpServletRequest request,
                                     HttpServletResponse response) {
         User user = returnUser(request, response);
@@ -132,8 +136,8 @@ public class MyPageService {
         user.updateAverageGrade(averageSum);
     }
 
-    @Transactional
-    public void resign(HttpServletRequest request, HttpServletResponse response) {    // 회원 탈퇴
+    @Transactional  // 회원 탈퇴 기능
+    public void resign(HttpServletRequest request, HttpServletResponse response) {
         User user = returnUser(request, response);
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
@@ -141,6 +145,12 @@ public class MyPageService {
         redisService.delValues(refreshToken);
     }
 
+    /*
+        중복되는 코드들이 많아 따로 빼내어 정리한 코드이다.
+        토큰 값을 검증하고 accessToken이 만료됐을 시 자동으로 재발급까지 해준다.
+        확인이 양호하다면 토큰에서 email 값을 추출하여 User 정보를 찾아온다.
+        User 정보를 성공적으로 찾았으면 반환하고 끝난다.
+     */
     private User returnUser(HttpServletRequest request, HttpServletResponse response) {
         String token = tokenService.validateAndReissueToken(request, response);
         String email = jwtTokenProvider.getUserEmail(token);

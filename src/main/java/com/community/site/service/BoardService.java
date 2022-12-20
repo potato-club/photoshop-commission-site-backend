@@ -43,7 +43,7 @@ public class BoardService {
     private final TokenService tokenService;
     private String nickname;
 
-    @Transactional
+    @Transactional  // 검색 기능 중 타이틀로 검색하기 기능이다. 한 페이지 당 16개씩 출력한다.
     public Page<ThumbnailResponseDto> getTitleBoardList(String keyword, int page) {
 
         Pageable pageable = PageRequest.of(page - 1, 16);
@@ -53,7 +53,7 @@ public class BoardService {
                 pageable, boardLists.getSize());
     }
 
-    @Transactional
+    @Transactional  // 검색 기능 중 닉네임으로 검색하기 기능이다. 한 페이지 당 16개씩 출력한다.
     public Page<ThumbnailResponseDto> getNicknameBoardList(String keyword, int page) {
 
         Pageable pageable = PageRequest.of(page - 1, 16);
@@ -63,7 +63,7 @@ public class BoardService {
                 pageable, boardLists.getSize());
     }
 
-    @Transactional
+    @Transactional  // 게시글 상세보기 기능이다.
     public BoardResponseDto findBoardList(Long id, HttpServletRequest request,
                                           HttpServletResponse response) {
 
@@ -84,7 +84,7 @@ public class BoardService {
         return boardResponseDto;
     }
 
-    @Transactional
+    @Transactional  // BEFORE 타입의 글들을 16개씩 보여준다. (Pagenation 적용)
     public Page<ThumbnailResponseDto> getAllBeforeBoardList(int page) {
 
         Pageable pageable = PageRequest.of(page - 1, 16);
@@ -94,7 +94,7 @@ public class BoardService {
                 pageable, boardLists.getSize());
     }
 
-    @Transactional
+    @Transactional  // REQUESTING 타입의 글들을 16개씩 보여준다. (Pagenation 적용)
     public Page<ThumbnailResponseDto> getAllRequestingBoardList(int page) {
 
         Pageable pageable = PageRequest.of(page - 1, 16);
@@ -104,7 +104,7 @@ public class BoardService {
                 pageable, boardLists.getSize());
     }
 
-    @Transactional
+    @Transactional  // COMPLETE 타입의 글들을 16개씩 보여준다. (Pagenation 적용)
     public Page<ThumbnailResponseDto> getAllCompleteBoardList(int page) {
 
         Pageable pageable = PageRequest.of(page - 1, 16);
@@ -114,7 +114,7 @@ public class BoardService {
                 pageable, boardLists.getSize());
     }
 
-    @Transactional
+    @Transactional  // BEFORE 타입의 최신 글 8개를 메인페이지에서 보여주는 기능이다.
     public List<ThumbnailResponseDto> getBeforeBoardList() {
 
         List<BoardList> boardLists = boardRepository.findByQuestEnum(BEFORE);
@@ -123,7 +123,7 @@ public class BoardService {
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional  // REQUESTING 타입의 최신 글 8개를 메인페이지에서 보여주는 기능이다.
     public List<ThumbnailResponseDto> getRequestingBoardList() {
 
         List<BoardList> boardLists = boardRepository.findByQuestEnum(REQUESTING);
@@ -131,7 +131,7 @@ public class BoardService {
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional  // COMPLETE 타입의 최신 글 8개를 메인페이지에서 보여주는 기능이다.
     public List<ThumbnailResponseDto> getCompleteBoardList() {
 
         List<BoardList> boardLists = boardRepository.findByQuestEnum(COMPLETE);
@@ -139,7 +139,7 @@ public class BoardService {
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional  // 게시글 작성 기능이다.
     public void createBoard(List<MultipartFile> image, ImageOpen imageOpen,
                                           BoardRequestDto boardListDto,
                                           HttpServletRequest request,
@@ -161,6 +161,7 @@ public class BoardService {
         uploadBoardListFile(image, boardList);
     }
 
+    // 사진을 S3 저장소에 올리고 그 요소들을 리스트로 반환하는 기능이다. (리스트 반환은 게시글 수정 2차 개발에서 사용할 예정이다.)
     private List<String> uploadBoardListFile(List<MultipartFile> image, BoardList boardList) {
         return image.stream()
                 .map(file -> s3UploadService.uploadFile(file))
@@ -169,6 +170,7 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
+    // DB에 올린 사진의 Url과 이름을 저장하는 기능이다.
     private File createFile(BoardList boardList, String url) {
         return fileRepository.save(File.builder()
                 .fileUrl(url)
@@ -198,6 +200,7 @@ public class BoardService {
         boardListDto.setImageOpen(imageOpen);
         boardList.update(boardListDto);
 
+        //  2차 개발
 //        validateDeletedFiles(boardListDto);
 //        uploadFiles(boardListDto, boardList);
 //
@@ -211,7 +214,7 @@ public class BoardService {
 //        UploadFileResponse uploadFileResponse = new UploadFileResponse(boardListDto.getId(), downloadUri);
     }
 
-    @Transactional
+    @Transactional  // 게시글 삭제 기능이다.
     public void deleteBoard(Long id, HttpServletRequest request, HttpServletResponse response) {
 
         String token = tokenService.validateAndReissueToken(request, response);
@@ -230,6 +233,7 @@ public class BoardService {
         boardRepository.delete(boardList);
     }
 
+    // 2차 개발
     //    private void validateDeletedFiles(BoardUpdateRequestDto boardListDto) {
 //        fileRepository.findBySavedFileUrl(boardListDto.getId()).stream()
 //                .filter(file -> !boardListDto.getSavedFileUrl().stream().anyMatch(Predicate.isEqual(file.getFileUrl())))

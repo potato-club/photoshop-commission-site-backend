@@ -24,7 +24,7 @@ import static javax.persistence.CascadeType.ALL;
 @Table(name = "comments")
 @Entity
 @BatchSize(size = 10)
-public class Comment {
+public class Comment {  // 댓글 엔티티
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,11 +43,11 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent")
-    private Comment parent;
+    private Comment parent;     // 부모 댓글
 
     @Builder.Default
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
-    private List<Comment> children = new ArrayList<>();
+    private List<Comment> children = new ArrayList<>();     // 자식 댓글
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_list_id")

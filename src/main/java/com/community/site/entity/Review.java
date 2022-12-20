@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Getter
-public class Review {
+public class Review {   // 후기 글을 저장하는 엔티티
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class Review {
     private String content;
 
     @Column(nullable = false)
-    private Double grade;
+    private Double grade;       // 평점
 
     @OneToOne
     @JoinColumn(name = "linked_board_list")

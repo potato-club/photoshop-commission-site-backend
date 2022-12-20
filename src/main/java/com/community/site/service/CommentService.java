@@ -34,7 +34,7 @@ public class CommentService {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenService tokenService;
 
-    @Transactional
+    @Transactional  // 부모 댓글을 작성하는 기능이다.
     public String createParentComment(Long id, CommentRequestDto commentDto, HttpServletRequest request,
                                       HttpServletResponse response) {
 
@@ -53,7 +53,7 @@ public class CommentService {
         return "부모 댓글 저장 완료";
     }
 
-    @Transactional
+    @Transactional  // 대댓글을 작성하기 위한 기능이다.
     public String createChildComment(CommentRequestDto commentDto, HttpServletRequest request,
                                      HttpServletResponse response) {
 
@@ -69,6 +69,7 @@ public class CommentService {
         return "자식 댓글 저장 완료";
     }
 
+    // 부모 댓글인지 대댓글인지 판별하는 기능이다.
     private Comment validateComment(Long parentId, Long userId, CommentRequestDto commentRequestDto) {
         Comment parent = commentRepository.getById(parentId);
         if (!parent.isParent()) {
@@ -81,14 +82,14 @@ public class CommentService {
                 commentRequestDto, parent);
     }
 
-    @Transactional
+    @Transactional  // 댓글을 불러오는 기능이다.
     public List<CommentResponseDto> readComment(Long id) {
         List<Comment> comments = commentRepository.findByBoardListIdAndParentIsNull(id);
 
         return comments.stream().map(CommentResponseDto::new).collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional  // 댓글을 수정할 수 있는 기능이다.
     public void updateComment(CommentUpdateRequestDto commentRequestDto, HttpServletRequest request,
                               HttpServletResponse response) {
 
@@ -107,7 +108,7 @@ public class CommentService {
         comment.update(commentRequestDto);
     }
 
-    @Transactional
+    @Transactional  // 댓글을 삭제할 수 있는 기능이다.
     public void deleteComment(CommentDeleteRequestDto requestDto, HttpServletRequest request,
                               HttpServletResponse response) {
 

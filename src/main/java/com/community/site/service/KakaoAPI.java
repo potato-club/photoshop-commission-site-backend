@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 @Service
-public class KakaoAPI {
+public class KakaoAPI {     // 카카오 서버와 연결 후 데이터를 가져오기 위한 코드이다.
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoClientId;

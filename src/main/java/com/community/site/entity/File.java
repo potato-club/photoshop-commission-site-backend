@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Table(name = "files")
-public class File {
+public class File {     // 게시글 사진 저장용 엔티티
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

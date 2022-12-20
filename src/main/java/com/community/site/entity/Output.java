@@ -17,7 +17,7 @@ import javax.persistence.*;
 @Builder
 @Getter
 @Table(name = "outputs")
-public class Output {
+public class Output {   // 작업 결과물 저장용 엔티티
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

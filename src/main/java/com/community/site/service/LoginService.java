@@ -37,7 +37,7 @@ public class LoginService {
     private final RedisService redisService;
     private final TokenService tokenService;
 
-    @Transactional
+    @Transactional  // 회원 가입 기능
     public MultiValueMap<String, Object> signUp(UserRequestDto userDto, HttpServletResponse response) {
 
         if (!userRepository.existsByNickname(userDto.getSerialCode())) {
@@ -67,7 +67,7 @@ public class LoginService {
         return sessionCarrier;
     }
 
-    @Transactional
+    @Transactional  // 카카오 소셜 로그인 후 신규 회원인지 기존 회원인지 판별하는 기능이다.
     public MultiValueMap<String, Object> checkUser(String code, HttpServletResponse response) {
         String access_token = kakaoAPI.getAccessToken(code);
         HashMap<String, Object> userInfo = kakaoAPI.getUserInfo(access_token);
@@ -80,10 +80,10 @@ public class LoginService {
             User user = userRepository.findByEmail(email).orElseThrow(() ->
                 { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
-            if (user.getIntroduction().equals("")) {
+            if (user.getIntroduction().equals("")) {    // 회원 가입 도중 나갔을 때 기존 정보는 삭제한다.
                 userRepository.delete(user);
                 sessionCarrier.add("fail", true);
-            } else {
+            } else {    // 이미 있는 회원이므로 토큰을 발급해주고 끝낸다.
 
                 String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRoles());
                 String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRoles());
@@ -93,10 +93,10 @@ public class LoginService {
 
                 redisService.setValues(refreshToken, user.getEmail());
 
-                sessionCarrier.add("nickname", user.getNickname());
-                sessionCarrier.add("userRole", user.getUserRole());
+                sessionCarrier.add("nickname", user.getNickname()); // 클라이언트 요청 데이터1
+                sessionCarrier.add("userRole", user.getUserRole()); // 클라이언트 요청 데이터2
             }
-        } else {
+        } else {    // 신규 회원이면 가가입을 시킨다. 이후 클라이언트에선 바로 signUp으로 보내고 위 signUp Api에서 처리하게 된다.
             Random random = new Random();
             int checkNum = random.nextInt(888888) + 111111;
             String nickname = "ID" + checkNum;
@@ -114,13 +114,13 @@ public class LoginService {
         return sessionCarrier;
     }
 
-    @Transactional
+    @Transactional  // 닉네임이 중복되는지 확인하는 기능이다.
     public boolean checkNickname(String nickname) {
         boolean nicknameDuplicate = userRepository.existsByNickname(nickname);
         return !nicknameDuplicate;
     }
 
-    @Transactional
+    @Transactional  // 로컬 테스트 용 회원가입 코드
     public TokenResponse createToken(TestRequestDto testRequestDto, HttpServletResponse response) {
         // test code
         if (userRepository.existsByNickname(testRequestDto.getNickname())) {
@@ -155,7 +155,7 @@ public class LoginService {
         return tokenResponse;
     }
 
-    @Transactional
+    @Transactional  // 로컬 테스트 용 토큰 확인용 코드
     public String resolverToken(UserMyPageRequestDto requestDto, HttpServletRequest request,
                                 HttpServletResponse response) {
 

@@ -23,7 +23,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Builder
 @Getter
 @Table(name = "users")
-public class User {
+public class User { // 회원 정보 엔티티
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -45,7 +45,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserRole userRole;
+    private UserRole userRole;  // 유저의 직업을 나타내는 Enum (ex. USER, ARTIST)
 
     @Column(nullable = false)
     private String introduction;
