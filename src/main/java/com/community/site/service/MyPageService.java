@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,10 +75,11 @@ public class MyPageService {
         User user = returnUser(request, response);
 
         Pageable pageable = PageRequest.of(page - 1, 16);
-        Page<BoardList> boardLists = boardRepository.findBySelectedArtist(user, pageable);
+        List<BoardList> boardLists = boardRepository.findBySelectedArtist(user);
+        Collections.reverse(boardLists);
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.getSize());
+                pageable, boardLists.size());
     }
 
     // 내 정보 업데이트

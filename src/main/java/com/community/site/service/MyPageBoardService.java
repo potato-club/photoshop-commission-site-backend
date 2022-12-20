@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.Id;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,11 +39,12 @@ public class MyPageBoardService {
         User user = returnUser(request, response);
 
         Pageable pageable = PageRequest.of(page - 1, 16);
-        Page<BoardList> boardLists = boardRepository.findAllByUser(user, pageable);
+        List<BoardList> boardLists = boardRepository.findAllByUser(user);
+        Collections.reverse(boardLists);
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .filter(i -> i.getQuestEnum().equals(BEFORE)).collect(Collectors.toList()),
-                pageable, boardLists.getSize());
+                pageable, boardLists.size());
     }
 
     @Transactional  // 마이페이지에서 내가 작성한 REQUESTING 타입의 글들을 전부 보여준다.
@@ -51,11 +53,12 @@ public class MyPageBoardService {
         User user = returnUser(request, response);
 
         Pageable pageable = PageRequest.of(page - 1, 16);
-        Page<BoardList> boardLists = boardRepository.findAllByUser(user, pageable);
+        List<BoardList> boardLists = boardRepository.findAllByUser(user);
+        Collections.reverse(boardLists);
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .filter(i -> i.getQuestEnum().equals(REQUESTING)).collect(Collectors.toList()),
-                pageable, boardLists.getSize());
+                pageable, boardLists.size());
     }
 
     @Transactional  // 마이페이지에서 내가 작성한 COMPLETE 타입의 글들을 전부 보여준다.
@@ -64,11 +67,12 @@ public class MyPageBoardService {
         User user = returnUser(request, response);
 
         Pageable pageable = PageRequest.of(page - 1, 16);
-        Page<BoardList> boardLists = boardRepository.findAllByUser(user, pageable);
+        List<BoardList> boardLists = boardRepository.findAllByUser(user);
+        Collections.reverse(boardLists);
 
         return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .filter(i -> i.getQuestEnum().equals(COMPLETE)).collect(Collectors.toList()),
-                pageable, boardLists.getSize());
+                pageable, boardLists.size());
     }
 
     @Transactional  // 마이페이지에서 내가 작성한 BEFORE 타입의 글 8개를 미리보기로 보여준다.
@@ -76,7 +80,7 @@ public class MyPageBoardService {
 
         User user = returnUser(request, response);
         List<BoardList> boardLists = boardRepository.findByUser(user);
-        boardLists.sort(Comparator.comparingLong(BoardList::getId));
+        Collections.reverse(boardLists);
 
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
                 .filter(i -> i.getQuestEnum().equals(BEFORE)).collect(Collectors.toList());
@@ -87,6 +91,7 @@ public class MyPageBoardService {
 
         User user = returnUser(request, response);
         List<BoardList> boardLists = boardRepository.findByUser(user);
+        Collections.reverse(boardLists);
 
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
                 .filter(i -> i.getQuestEnum().equals(REQUESTING)).collect(Collectors.toList());
@@ -97,6 +102,7 @@ public class MyPageBoardService {
 
         User user = returnUser(request, response);
         List<BoardList> boardLists = boardRepository.findByUser(user);
+        Collections.reverse(boardLists);
 
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
                 .filter(i -> i.getQuestEnum().equals(COMPLETE)).collect(Collectors.toList());
