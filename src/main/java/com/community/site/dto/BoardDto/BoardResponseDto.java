@@ -17,13 +17,8 @@ import static com.community.site.enumcustom.ImageOpen.OPEN;
 public class BoardResponseDto {
 
     private Long id;
-
-    @JsonFormat(pattern = "yyyy.MM.dd")
     private String createdDate;
-
-    @JsonFormat(pattern = "yyyy.MM.dd")
     private String modifiedDate;
-
     private String nickname;
     private String title;
     private ImageOpen imageOpen;

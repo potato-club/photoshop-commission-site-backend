@@ -22,11 +22,11 @@ public class CommentRequestDto {
     @NotBlank(message = "댓글은 1자 이상 100자 이하여야 합니다.")
     private String comment;
 
-    @ApiModelProperty(value="생성 시간", example = "yyyy.MM.dd HH:mm", hidden = true)
-    private String createdDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+    @ApiModelProperty(value="생성 시간", example = "yyyy-MM-dd HH:mm", hidden = true)
+    private String createdDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
-    @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd HH:mm", hidden = true)
-    private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+    @ApiModelProperty(value="수정 시간", example = "yyyy-MM-dd HH:mm", hidden = true)
+    private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
     @ApiModelProperty(value="게시글 정보", example = "board_list_id", hidden = true)
     private BoardList boardList;

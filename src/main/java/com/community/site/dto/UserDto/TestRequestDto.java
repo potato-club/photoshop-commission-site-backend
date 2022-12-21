@@ -34,9 +34,9 @@ public class TestRequestDto {
     @ApiModelProperty(value="이메일", example = "test@gmail.com", required = true)
     private String email;
 
-    @ApiModelProperty(value="생성 시간", example = "yyyy.MM.dd", hidden = true)
+    @ApiModelProperty(value="생성 시간", example = "yyyy-MM-dd", hidden = true)
     private String createdDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-    @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd", hidden = true)
+    @ApiModelProperty(value="수정 시간", example = "yyyy-MM-dd", hidden = true)
     private String modifiedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 }

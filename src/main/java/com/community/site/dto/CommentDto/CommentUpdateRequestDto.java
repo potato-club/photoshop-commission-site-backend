@@ -23,6 +23,6 @@ public class CommentUpdateRequestDto {
     @NotBlank(message = "댓글은 1자 이상 100자 이하여야 합니다.")
     private String comment;
 
-    @ApiModelProperty(value="수정 시간", example = "yyyy.MM.dd HH:mm", hidden = true)
-    private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+    @ApiModelProperty(value="수정 시간", example = "yyyy-MM-dd HH:mm", hidden = true)
+    private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 }
