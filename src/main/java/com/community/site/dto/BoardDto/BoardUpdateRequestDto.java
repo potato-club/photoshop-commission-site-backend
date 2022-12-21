@@ -18,8 +18,8 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 public class BoardUpdateRequestDto {
 
-    @ApiModelProperty(value="수정 시간", example = "yyyy-MM-dd", hidden = true)
-    private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    @ApiModelProperty(value="수정 시간", example = "yyyy-MM-dd HH:mm", hidden = true)
+    private String modifiedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
     @ApiModelProperty(value="게시글 제목", example = "테스트 제목입니다.", required = true)
     private String title;
