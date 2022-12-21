@@ -1,12 +1,9 @@
 package com.community.site.service;
 
-import com.community.site.dto.CommentDto.CommentDeleteRequestDto;
-import com.community.site.dto.CommentDto.CommentResponseDto;
-import com.community.site.dto.CommentDto.CommentUpdateRequestDto;
+import com.community.site.dto.CommentDto.*;
 import com.community.site.Repository.BoardRepository;
 import com.community.site.Repository.CommentRepository;
 import com.community.site.Repository.UserRepository;
-import com.community.site.dto.CommentDto.CommentRequestDto;
 import com.community.site.entity.BoardList;
 import com.community.site.entity.Comment;
 import com.community.site.entity.User;
@@ -54,7 +51,7 @@ public class CommentService {
     }
 
     @Transactional  // 대댓글을 작성하기 위한 기능이다.
-    public String createChildComment(CommentRequestDto commentDto, HttpServletRequest request,
+    public String createChildComment(CommentChildRequestDto commentDto, HttpServletRequest request,
                                      HttpServletResponse response) {
 
         String token = tokenService.validateAndReissueToken(request, response);
@@ -63,7 +60,13 @@ public class CommentService {
         User user = userRepository.findByEmail(email).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION); });
 
-        Comment child = validateComment(commentDto.getParentId(), user.getId(), commentDto);
+        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
+                .comment(commentDto.getComment())
+                .createdDate(commentDto.getCreatedDate())
+                .modifiedDate(commentDto.getModifiedDate())
+                .build();
+
+        Comment child = validateComment(commentDto.getParentId(), user.getId(), commentRequestDto);
         commentRepository.save(child);
 
         return "자식 댓글 저장 완료";

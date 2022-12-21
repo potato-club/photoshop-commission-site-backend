@@ -1,10 +1,7 @@
 package com.community.site.controller;
 
-import com.community.site.dto.CommentDto.CommentDeleteRequestDto;
-import com.community.site.dto.CommentDto.CommentResponseDto;
-import com.community.site.dto.CommentDto.CommentUpdateRequestDto;
+import com.community.site.dto.CommentDto.*;
 import com.community.site.service.CommentService;
-import com.community.site.dto.CommentDto.CommentRequestDto;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +29,10 @@ public class CommentController {
     }
 
     @PostMapping("/list/{id}/comments/child")
-    public ResponseEntity<String> createChildComment(@RequestBody CommentRequestDto commentRequestDto,
+    public ResponseEntity<String> createChildComment(@RequestBody CommentChildRequestDto commentChildRequestDto,
                                                      @ApiIgnore HttpServletRequest request,
                                                      @ApiIgnore HttpServletResponse response) {
-        return ResponseEntity.ok(commentService.createChildComment(commentRequestDto, request, response));
+        return ResponseEntity.ok(commentService.createChildComment(commentChildRequestDto, request, response));
     }
 
     @GetMapping("/list/{id}/comments")

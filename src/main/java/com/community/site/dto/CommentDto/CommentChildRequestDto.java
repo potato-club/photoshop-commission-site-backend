@@ -1,7 +1,6 @@
 package com.community.site.dto.CommentDto;
 
 import com.community.site.entity.BoardList;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,10 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CommentRequestDto {
+public class CommentChildRequestDto {
+
+    @ApiModelProperty(value="부모 댓글 Id", example = "1", required = true)
+    private Long parentId;
 
     @ApiModelProperty(value="댓글 내용", example = "재밌당", required = true)
     @NotBlank(message = "댓글은 1자 이상 100자 이하여야 합니다.")
@@ -31,4 +33,3 @@ public class CommentRequestDto {
     @ApiModelProperty(value="게시글 정보", example = "board_list_id", hidden = true)
     private BoardList boardList;
 }
-

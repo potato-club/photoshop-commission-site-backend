@@ -1,14 +1,18 @@
 package com.community.site.service;
 
 import com.community.site.Repository.BoardRepository;
+import com.community.site.Repository.CommentRepository;
 import com.community.site.Repository.ReviewRepository;
 import com.community.site.Repository.UserRepository;
 import com.community.site.dto.BoardDto.ThumbnailResponseDto;
+import com.community.site.dto.BoardDto.UserReviewResponseDto;
+import com.community.site.dto.CommentDto.MyCommentResponseDto;
 import com.community.site.dto.ReviewDto.ReviewRequestDto;
 import com.community.site.dto.ReviewDto.ReviewResponseDto;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
 import com.community.site.dto.UserDto.UserResponseDto;
 import com.community.site.entity.BoardList;
+import com.community.site.entity.Comment;
 import com.community.site.entity.Review;
 import com.community.site.entity.User;
 import com.community.site.error.ErrorCode;
@@ -29,6 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.community.site.enumcustom.BoardEnumCustom.COMPLETE;
+import static com.community.site.enumcustom.BoardEnumCustom.REQUESTING;
 
 @RequiredArgsConstructor
 @Transactional
@@ -41,6 +46,7 @@ public class MyPageService {
     private final ReviewRepository reviewRepository;
     private final RedisService redisService;
     private final TokenService tokenService;
+    private final CommentRepository commentRepository;
 
     @Transactional  // 마이페이지에서 자신의 정보를 불러온다.
     public UserResponseDto viewMyPage(HttpServletRequest request, HttpServletResponse response) {     // 내 정보 보기
@@ -57,16 +63,41 @@ public class MyPageService {
         return String.format("%.1f", user.getGrade());
     }
 
+    @Transactional  // 자기가 작성한 글 중 의뢰가 성립된 글을 보여준다.
+    public Page<UserReviewResponseDto> viewReviewListToMe(HttpServletRequest request, HttpServletResponse response,
+                                                            int page) {
+        User user = returnUser(request, response);
+
+        Pageable pageable = PageRequest.of(page - 1, 6);
+        List<BoardList> boardLists = boardRepository.findByUser(user);
+        Collections.reverse(boardLists);
+
+        return new PageImpl<>(boardLists.stream().filter(i -> i.getQuestEnum().equals(REQUESTING))
+                .map(UserReviewResponseDto::new).collect(Collectors.toList()), pageable, boardLists.size());
+    }
+
+    @Transactional  // 작성한 댓글들을 리스트로 볼 수 있다.
+    public Page<MyCommentResponseDto> viewComments(HttpServletRequest request, HttpServletResponse response, int page) {
+        User user = returnUser(request, response);
+
+        Pageable pageable = PageRequest.of(page - 1, 6);
+        List<Comment> comments = commentRepository.findByUser(user);
+        Collections.reverse(comments);
+
+        return new PageImpl<>(comments.stream().map(MyCommentResponseDto::new)
+                .collect(Collectors.toList()), pageable, comments.size());
+    }
+
     @Transactional  // 작성된 후기들을 볼 수 있다. (ARTIST 관점)
     public Page<ReviewResponseDto> viewReviewList(HttpServletRequest request, HttpServletResponse response,
                                                   int page) {
         User user = returnUser(request, response);
 
         Pageable pageable = PageRequest.of(page - 1, 16);
-        Page<Review> reviews = reviewRepository.findByUser(user, pageable);
+        List<Review> reviews = reviewRepository.findByUser(user);
 
         return new PageImpl<>(reviews.stream().map(ReviewResponseDto::new).collect(Collectors.toList()),
-                pageable, reviews.getSize());
+                pageable, reviews.size());
     }
 
     @Transactional  // 자신의 Enum이 ARTIST일 때 의뢰를 수주한 게시글들을 출력해준다.

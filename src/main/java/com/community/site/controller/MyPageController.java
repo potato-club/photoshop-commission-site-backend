@@ -1,6 +1,8 @@
 package com.community.site.controller;
 
 import com.community.site.dto.BoardDto.ThumbnailResponseDto;
+import com.community.site.dto.BoardDto.UserReviewResponseDto;
+import com.community.site.dto.CommentDto.MyCommentResponseDto;
 import com.community.site.dto.ReviewDto.ReviewRequestDto;
 import com.community.site.dto.ReviewDto.ReviewResponseDto;
 import com.community.site.dto.UserDto.UserMyPageRequestDto;
@@ -39,6 +41,20 @@ public class MyPageController {
                                                   @ApiIgnore HttpServletResponse response,
                                                   @RequestParam("page") int page) {
         return myPageService.viewReviewList(request, response, page);
+    }
+
+    @GetMapping("/mypage/boards")
+    public Page<UserReviewResponseDto> viewReviewListToMe(@ApiIgnore HttpServletRequest request,
+                                                            @ApiIgnore HttpServletResponse response,
+                                                            @RequestParam("page") int page) {
+        return myPageService.viewReviewListToMe(request, response, page);
+    }
+
+    @GetMapping("/mypage/comments")
+    public Page<MyCommentResponseDto> viewComments(@ApiIgnore HttpServletRequest request,
+                                                   @ApiIgnore HttpServletResponse response,
+                                                   @RequestParam("page") int page) {
+        return myPageService.viewComments(request, response, page);
     }
 
     @GetMapping("/mypage/grade")
