@@ -2,6 +2,7 @@ package com.community.site.service;
 
 import com.community.site.dto.BoardDto.*;
 import com.community.site.entity.File;
+import com.community.site.enumcustom.BoardEnumCustom;
 import com.community.site.enumcustom.ImageOpen;
 import com.community.site.service.S3.S3UploadService;
 import com.community.site.Repository.BoardRepository;
@@ -21,9 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,23 +46,31 @@ public class BoardService {
     @Transactional  // 검색 기능 중 타이틀로 검색하기 기능이다. 한 페이지 당 16개씩 출력한다.
     public Page<ThumbnailResponseDto> getTitleBoardList(String keyword, int page) {
 
+        long totalElements = boardRepository.countByTitle(keyword);
         Pageable pageable = PageRequest.of(page - 1, 16);
+
         List<BoardList> boardLists = boardRepository.findByTitle(keyword);
         Collections.reverse(boardLists);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
+                .collect(Collectors.toList()), pageable, totalElements);
+
+        return pageList;
     }
 
     @Transactional  // 검색 기능 중 닉네임으로 검색하기 기능이다. 한 페이지 당 16개씩 출력한다.
     public Page<ThumbnailResponseDto> getNicknameBoardList(String keyword, int page) {
 
+        long totalElements = boardRepository.countByNickname(keyword);
         Pageable pageable = PageRequest.of(page - 1, 16);
+
         List<BoardList> boardLists = boardRepository.findByNickname(keyword);
         Collections.reverse(boardLists);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
+                .collect(Collectors.toList()), pageable, totalElements);
+
+        return pageList;
     }
 
     @Transactional  // 게시글 상세보기 기능이다.
@@ -87,61 +94,56 @@ public class BoardService {
         return boardResponseDto;
     }
 
-    @Transactional  // BEFORE 타입의 글들을 16개씩 보여준다. (Pagenation 적용)
+    @Transactional  // BEFORE 타입의 글들을 16개씩 보여준다. (Pagination 적용)
     public Page<ThumbnailResponseDto> getAllBeforeBoardList(int page) {
-
-        Pageable pageable = PageRequest.of(page - 1, 16);
-        List<BoardList> boardLists = boardRepository.findAllByQuestEnum(BEFORE);
-        Collections.reverse(boardLists);
-
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        return mainPageBoardList(BEFORE, page);
     }
 
-    @Transactional  // REQUESTING 타입의 글들을 16개씩 보여준다. (Pagenation 적용)
+    @Transactional  // REQUESTING 타입의 글들을 16개씩 보여준다. (Pagination 적용)
     public Page<ThumbnailResponseDto> getAllRequestingBoardList(int page) {
-
-        Pageable pageable = PageRequest.of(page - 1, 16);
-        List<BoardList> boardLists = boardRepository.findAllByQuestEnum(REQUESTING);
-        Collections.reverse(boardLists);
-
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        return mainPageBoardList(REQUESTING, page);
     }
 
-    @Transactional  // COMPLETE 타입의 글들을 16개씩 보여준다. (Pagenation 적용)
+    @Transactional  // COMPLETE 타입의 글들을 16개씩 보여준다. (Pagination 적용)
     public Page<ThumbnailResponseDto> getAllCompleteBoardList(int page) {
-
-        Pageable pageable = PageRequest.of(page - 1, 16);
-        List<BoardList> boardLists = boardRepository.findAllByQuestEnum(COMPLETE);
-        Collections.reverse(boardLists);
-
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        return mainPageBoardList(COMPLETE, page);
     }
 
     @Transactional  // BEFORE 타입의 최신 글 8개를 메인페이지에서 보여주는 기능이다.
     public List<ThumbnailResponseDto> getBeforeBoardList() {
-
-        List<BoardList> boardLists = boardRepository.findByQuestEnum(BEFORE);
-        Collections.reverse(boardLists);
-
-        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
+        return mainListBoardList(BEFORE);
     }
 
     @Transactional  // REQUESTING 타입의 최신 글 8개를 메인페이지에서 보여주는 기능이다.
     public List<ThumbnailResponseDto> getRequestingBoardList() {
-
-        List<BoardList> boardLists = boardRepository.findByQuestEnum(REQUESTING);
-        Collections.reverse(boardLists);
-
-        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
+        return mainListBoardList(REQUESTING);
     }
 
     @Transactional  // COMPLETE 타입의 최신 글 8개를 메인페이지에서 보여주는 기능이다.
     public List<ThumbnailResponseDto> getCompleteBoardList() {
+        return mainListBoardList(COMPLETE);
+    }
 
-        List<BoardList> boardLists = boardRepository.findByQuestEnum(COMPLETE);
+    /*
+        중복되는 코드들이 많아 따로 빼내어 정리한 코드이다.
+        게시글 목록을 게시글 상태에 따라 보여주는 코드이다.
+     */
+    private Page<ThumbnailResponseDto> mainPageBoardList(BoardEnumCustom boardEnumCustom, int page) {
+
+        long totalElements = boardRepository.countByQuestEnum(boardEnumCustom);
+        Pageable pageable = PageRequest.of(page - 1, 16);
+
+        List<BoardList> boardLists = boardRepository.findAllByQuestEnum(boardEnumCustom, pageable);
+        Collections.reverse(boardLists);
+
+        Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
+                .collect(Collectors.toList()), pageable, totalElements);
+
+        return pageList;
+    }
+
+    private List<ThumbnailResponseDto> mainListBoardList(BoardEnumCustom boardEnumCustom) {
+        List<BoardList> boardLists = boardRepository.findByQuestEnum(boardEnumCustom);
         Collections.reverse(boardLists);
 
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());

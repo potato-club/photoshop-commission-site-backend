@@ -8,6 +8,18 @@
 
 ### 브랜치 설명
 
-주 테스트 브랜치 : develop
+메인 브랜치 : main
 
 개인 테스트 브랜치 : develop_first, develop_second
+
+
+### 프론트/백엔드 도메인 주소
+
+- 프론트 : easyphoto.site
+
+- 백엔드 : https://photoshopcommission.shop
+
+
+### 프론트 깃 주소
+
+https://github.com/potato-club/photoshop-commission-site

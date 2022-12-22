@@ -68,24 +68,33 @@ public class MyPageService {
                                                             int page) {
         User user = returnUser(request, response);
 
+        long totalElements = boardRepository.countByUser(user);
         Pageable pageable = PageRequest.of(page - 1, 6);
+
         List<BoardList> boardLists = boardRepository.findByUser(user);
         Collections.reverse(boardLists);
 
-        return new PageImpl<>(boardLists.stream().filter(i -> i.getQuestEnum().equals(REQUESTING))
-                .map(UserReviewResponseDto::new).collect(Collectors.toList()), pageable, boardLists.size());
+        Page<UserReviewResponseDto> pageList = new PageImpl<>(boardLists.stream().filter(i -> i.getQuestEnum()
+                        .equals(REQUESTING)).map(UserReviewResponseDto::new)
+                        .collect(Collectors.toList()), pageable, totalElements);
+
+        return pageList;
     }
 
     @Transactional  // 작성한 댓글들을 리스트로 볼 수 있다.
     public Page<MyCommentResponseDto> viewComments(HttpServletRequest request, HttpServletResponse response, int page) {
         User user = returnUser(request, response);
 
+        long totalElements = commentRepository.countByUser(user);
         Pageable pageable = PageRequest.of(page - 1, 6);
+
         List<Comment> comments = commentRepository.findByUser(user);
         Collections.reverse(comments);
 
-        return new PageImpl<>(comments.stream().map(MyCommentResponseDto::new)
-                .collect(Collectors.toList()), pageable, comments.size());
+        Page<MyCommentResponseDto> pageList = new PageImpl<>(comments.stream().map(MyCommentResponseDto::new)
+                .collect(Collectors.toList()), pageable, totalElements);
+
+        return pageList;
     }
 
     @Transactional  // 작성된 후기들을 볼 수 있다. (ARTIST 관점)
@@ -93,11 +102,16 @@ public class MyPageService {
                                                   int page) {
         User user = returnUser(request, response);
 
+        long totalElements = reviewRepository.countByUser(user);
         Pageable pageable = PageRequest.of(page - 1, 16);
-        List<Review> reviews = reviewRepository.findByUser(user);
 
-        return new PageImpl<>(reviews.stream().map(ReviewResponseDto::new).collect(Collectors.toList()),
-                pageable, reviews.size());
+        List<Review> reviews = reviewRepository.findByUser(user);
+        Collections.reverse(reviews);
+
+        Page<ReviewResponseDto> pageList = new PageImpl<>(reviews.stream().map(ReviewResponseDto::new)
+                .collect(Collectors.toList()), pageable, totalElements);
+
+        return pageList;
     }
 
     @Transactional  // 자신의 Enum이 ARTIST일 때 의뢰를 수주한 게시글들을 출력해준다.
@@ -105,12 +119,16 @@ public class MyPageService {
                                            int page) {
         User user = returnUser(request, response);
 
+        long totalElements = boardRepository.countBySelectedArtist(user);
         Pageable pageable = PageRequest.of(page - 1, 16);
+
         List<BoardList> boardLists = boardRepository.findBySelectedArtist(user);
         Collections.reverse(boardLists);
 
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
+                .collect(Collectors.toList()), pageable, totalElements);
+
+        return pageList;
     }
 
     // 내 정보 업데이트

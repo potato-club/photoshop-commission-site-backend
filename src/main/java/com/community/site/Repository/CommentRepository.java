@@ -9,4 +9,6 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByBoardListIdAndParentIsNull(Long id);
     List<Comment> findByUser(User user);
+
+    long countByUser(User user);
 }

@@ -5,6 +5,7 @@ import com.community.site.Repository.UserRepository;
 import com.community.site.dto.BoardDto.ThumbnailResponseDto;
 import com.community.site.entity.BoardList;
 import com.community.site.entity.User;
+import com.community.site.enumcustom.BoardEnumCustom;
 import com.community.site.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +39,7 @@ public class MyPageBoardService {
                                                             int page) {
         User user = returnUser(request, response);
 
-        Pageable pageable = PageRequest.of(page - 1, 16);
-        List<BoardList> boardLists = boardRepository.findAllByUser(user);
-        Collections.reverse(boardLists);
-
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
-                .filter(i -> i.getQuestEnum().equals(BEFORE)).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        return myPageBoardList(user, BEFORE, page);
     }
 
     @Transactional  // 마이페이지에서 내가 작성한 REQUESTING 타입의 글들을 전부 보여준다.
@@ -52,13 +47,7 @@ public class MyPageBoardService {
                                                                 int page) {
         User user = returnUser(request, response);
 
-        Pageable pageable = PageRequest.of(page - 1, 16);
-        List<BoardList> boardLists = boardRepository.findAllByUser(user);
-        Collections.reverse(boardLists);
-
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
-                .filter(i -> i.getQuestEnum().equals(REQUESTING)).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        return myPageBoardList(user, REQUESTING, page);
     }
 
     @Transactional  // 마이페이지에서 내가 작성한 COMPLETE 타입의 글들을 전부 보여준다.
@@ -66,46 +55,31 @@ public class MyPageBoardService {
                                                               int page) {
         User user = returnUser(request, response);
 
-        Pageable pageable = PageRequest.of(page - 1, 16);
-        List<BoardList> boardLists = boardRepository.findAllByUser(user);
-        Collections.reverse(boardLists);
-
-        return new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
-                .filter(i -> i.getQuestEnum().equals(COMPLETE)).collect(Collectors.toList()),
-                pageable, boardLists.size());
+        return myPageBoardList(user, COMPLETE, page);
     }
 
     @Transactional  // 마이페이지에서 내가 작성한 BEFORE 타입의 글 8개를 미리보기로 보여준다.
     public List<ThumbnailResponseDto> myPageBeforeBoardList(HttpServletRequest request, HttpServletResponse response) {
 
         User user = returnUser(request, response);
-        List<BoardList> boardLists = boardRepository.findByUser(user);
-        Collections.reverse(boardLists);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
-                .filter(i -> i.getQuestEnum().equals(BEFORE)).collect(Collectors.toList());
+        return myListBoardList(user, BEFORE);
     }
 
     @Transactional  // 마이페이지에서 내가 작성한 REQUESTING 타입의 글 8개를 미리보기로 보여준다.
     public List<ThumbnailResponseDto> myPageRequestingBoardList(HttpServletRequest request, HttpServletResponse response) {
 
         User user = returnUser(request, response);
-        List<BoardList> boardLists = boardRepository.findByUser(user);
-        Collections.reverse(boardLists);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
-                .filter(i -> i.getQuestEnum().equals(REQUESTING)).collect(Collectors.toList());
+        return myListBoardList(user, REQUESTING);
     }
 
     @Transactional  // 마이페이지에서 내가 작성한 COMPLETE 타입의 글 8개를 미리보기로 보여준다.
     public List<ThumbnailResponseDto> myPageCompleteBoardList(HttpServletRequest request, HttpServletResponse response) {
 
         User user = returnUser(request, response);
-        List<BoardList> boardLists = boardRepository.findByUser(user);
-        Collections.reverse(boardLists);
 
-        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8)
-                .filter(i -> i.getQuestEnum().equals(COMPLETE)).collect(Collectors.toList());
+        return myListBoardList(user, COMPLETE);
     }
 
     /*
@@ -120,5 +94,30 @@ public class MyPageBoardService {
 
         User user = userRepository.findByEmail(email).orElseThrow();
         return user;
+    }
+
+    /*
+        중복되는 코드들이 많아 따로 빼내어 정리한 코드이다.
+        게시글 목록을 게시글 상태와 자신의 작성 유무에 따라 보여주는 코드이다.
+     */
+    private Page<ThumbnailResponseDto> myPageBoardList(User user, BoardEnumCustom boardEnumCustom, int page) {
+
+        long totalElements = boardRepository.countByUserAndQuestEnum(user, boardEnumCustom);
+        Pageable pageable = PageRequest.of(page - 1, 16);
+
+        List<BoardList> boardLists = boardRepository.findByUserAndQuestEnum(user, boardEnumCustom);
+        Collections.reverse(boardLists);
+
+        Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
+                .collect(Collectors.toList()), pageable, totalElements);
+
+        return pageList;
+    }
+
+    private List<ThumbnailResponseDto> myListBoardList(User user, BoardEnumCustom boardEnumCustom) {
+        List<BoardList> boardLists = boardRepository.findByUserAndQuestEnum(user, boardEnumCustom);
+        Collections.reverse(boardLists);
+
+        return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
 }
