@@ -46,10 +46,10 @@ public class BoardService {
     @Transactional  // 검색 기능 중 타이틀로 검색하기 기능이다. 한 페이지 당 16개씩 출력한다.
     public Page<ThumbnailResponseDto> getTitleBoardList(String keyword, int page) {
 
-        long totalElements = boardRepository.countByTitle(keyword);
+        long totalElements = boardRepository.countByTitleContaining(keyword);
         Pageable pageable = PageRequest.of(page - 1, 16);
 
-        List<BoardList> boardLists = boardRepository.findByTitle(keyword);
+        List<BoardList> boardLists = boardRepository.findByTitleContaining(keyword, pageable);
         Collections.reverse(boardLists);
 
         Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
@@ -61,10 +61,10 @@ public class BoardService {
     @Transactional  // 검색 기능 중 닉네임으로 검색하기 기능이다. 한 페이지 당 16개씩 출력한다.
     public Page<ThumbnailResponseDto> getNicknameBoardList(String keyword, int page) {
 
-        long totalElements = boardRepository.countByNickname(keyword);
+        long totalElements = boardRepository.countByNicknameContaining(keyword);
         Pageable pageable = PageRequest.of(page - 1, 16);
 
-        List<BoardList> boardLists = boardRepository.findByNickname(keyword);
+        List<BoardList> boardLists = boardRepository.findByNicknameContaining(keyword, pageable);
         Collections.reverse(boardLists);
 
         Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)

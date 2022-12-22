@@ -13,8 +13,8 @@ import java.util.Optional;
 
 @Repository
 public interface BoardRepository extends JpaRepository<BoardList, Long> {
-    List<BoardList> findByNickname(String nickname);
-    List<BoardList> findByTitle(String title);
+    List<BoardList> findByNicknameContaining(String nickname, Pageable pageable);
+    List<BoardList> findByTitleContaining(String title, Pageable pageable);
     Optional<BoardList> findById(Long id);
     List<BoardList> findAllByQuestEnum(BoardEnumCustom questEnum, Pageable pageable);
     List<BoardList> findByUserAndQuestEnum(User user, BoardEnumCustom boardEnumCustom);
@@ -22,8 +22,8 @@ public interface BoardRepository extends JpaRepository<BoardList, Long> {
     List<BoardList> findByUser(User user);
     List<BoardList> findBySelectedArtist(User user);
     long countByQuestEnum(BoardEnumCustom questEnum);
-    long countByNickname(String keyword);
-    long countByTitle(String keyword);
+    long countByNicknameContaining(String keyword);
+    long countByTitleContaining(String keyword);
     long countByUser(User user);
     long countBySelectedArtist(User user);
     long countByUserAndQuestEnum(User user, BoardEnumCustom boardEnumCustom);
