@@ -167,8 +167,15 @@ public class MyPageService {
         BoardList boardList = boardRepository.findById(requestDto.getRoomId()).orElseThrow(() ->
         { throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION); });
 
-        List<Review> averageGrade = reviewRepository.findAllByUser(boardList.getSelectedArtist());
-        Double averageSum = averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() / averageGrade.size();
+        if (boardList.getSelectedArtist().equals("")) {
+            throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        } else if (boardList.getOutputs().equals("")) {
+            throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION);
+        }
+
+        List<Review> averageGrade = reviewRepository.getByUser(boardList.getSelectedArtist());
+        Double averageSum = averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() / averageGrade.size() +
+                averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() % averageGrade.size();
 
         reviewRepository.save(requestDto.builder()
                 .roomId(requestDto.getRoomId())

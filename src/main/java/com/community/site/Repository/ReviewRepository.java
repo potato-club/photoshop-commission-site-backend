@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    List<Review> findAllByUser(User user);
+    List<Review> getByUser(User user);
     List<Review> findByUser(User user);
 
     long countByUser(User user);
