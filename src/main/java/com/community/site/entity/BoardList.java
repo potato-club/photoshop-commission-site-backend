@@ -68,7 +68,7 @@ public class BoardList {
     private List<String> requestList = new ArrayList<>();
 
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
-    @OrderBy("id desc") // 내림차순 정렬
+    @OrderBy("id asc") // 오름차순 정렬
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "boardList", orphanRemoval = true)
