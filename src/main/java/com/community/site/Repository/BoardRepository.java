@@ -13,14 +13,14 @@ import java.util.Optional;
 
 @Repository
 public interface BoardRepository extends JpaRepository<BoardList, Long> {
-    List<BoardList> findByNicknameContaining(String nickname, Pageable pageable);
-    List<BoardList> findByTitleContaining(String title, Pageable pageable);
+    List<BoardList> findByNicknameContainingOrderByIdDesc(String nickname, Pageable pageable);
+    List<BoardList> findByTitleContainingOrderByIdDesc(String title, Pageable pageable);
     Optional<BoardList> findById(Long id);
-    List<BoardList> findAllByQuestEnum(BoardEnumCustom questEnum, Pageable pageable);
-    List<BoardList> findByUserAndQuestEnum(User user, BoardEnumCustom boardEnumCustom);
-    List<BoardList> findByQuestEnum(BoardEnumCustom questEnum);
+    List<BoardList> findAllByQuestEnumOrderByIdDesc(BoardEnumCustom questEnum, Pageable pageable);
+    List<BoardList> findByUserAndQuestEnumOrderByIdDesc(User user, BoardEnumCustom boardEnumCustom);
+    List<BoardList> findByQuestEnumOrderByIdDesc(BoardEnumCustom questEnum);
     List<BoardList> findByUser(User user);
-    List<BoardList> findBySelectedArtist(User user);
+    List<BoardList> findBySelectedArtistOrderByIdDesc(User user, Pageable pageable);
     long countByQuestEnum(BoardEnumCustom questEnum);
     long countByNicknameContaining(String keyword);
     long countByTitleContaining(String keyword);

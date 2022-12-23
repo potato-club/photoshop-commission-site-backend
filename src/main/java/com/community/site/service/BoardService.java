@@ -49,7 +49,7 @@ public class BoardService {
         long totalElements = boardRepository.countByTitleContaining(keyword);
         Pageable pageable = PageRequest.of(page - 1, 16);
 
-        List<BoardList> boardLists = boardRepository.findByTitleContaining(keyword, pageable);
+        List<BoardList> boardLists = boardRepository.findByTitleContainingOrderByIdDesc(keyword, pageable);
         Collections.reverse(boardLists);
 
         Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
@@ -64,7 +64,7 @@ public class BoardService {
         long totalElements = boardRepository.countByNicknameContaining(keyword);
         Pageable pageable = PageRequest.of(page - 1, 16);
 
-        List<BoardList> boardLists = boardRepository.findByNicknameContaining(keyword, pageable);
+        List<BoardList> boardLists = boardRepository.findByNicknameContainingOrderByIdDesc(keyword, pageable);
         Collections.reverse(boardLists);
 
         Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
@@ -133,8 +133,7 @@ public class BoardService {
         long totalElements = boardRepository.countByQuestEnum(boardEnumCustom);
         Pageable pageable = PageRequest.of(page - 1, 16);
 
-        List<BoardList> boardLists = boardRepository.findAllByQuestEnum(boardEnumCustom, pageable);
-        Collections.reverse(boardLists);
+        List<BoardList> boardLists = boardRepository.findAllByQuestEnumOrderByIdDesc(boardEnumCustom, pageable);
 
         Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .collect(Collectors.toList()), pageable, totalElements);
@@ -143,8 +142,7 @@ public class BoardService {
     }
 
     private List<ThumbnailResponseDto> mainListBoardList(BoardEnumCustom boardEnumCustom) {
-        List<BoardList> boardLists = boardRepository.findByQuestEnum(boardEnumCustom);
-        Collections.reverse(boardLists);
+        List<BoardList> boardLists = boardRepository.findByQuestEnumOrderByIdDesc(boardEnumCustom);
 
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }

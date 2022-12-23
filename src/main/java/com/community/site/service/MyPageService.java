@@ -106,7 +106,6 @@ public class MyPageService {
         Pageable pageable = PageRequest.of(page - 1, 16);
 
         List<Review> reviews = reviewRepository.findByUser(user);
-        Collections.reverse(reviews);
 
         Page<ReviewResponseDto> pageList = new PageImpl<>(reviews.stream().map(ReviewResponseDto::new)
                 .collect(Collectors.toList()), pageable, totalElements);
@@ -122,8 +121,7 @@ public class MyPageService {
         long totalElements = boardRepository.countBySelectedArtist(user);
         Pageable pageable = PageRequest.of(page - 1, 16);
 
-        List<BoardList> boardLists = boardRepository.findBySelectedArtist(user);
-        Collections.reverse(boardLists);
+        List<BoardList> boardLists = boardRepository.findBySelectedArtistOrderByIdDesc(user, pageable);
 
         Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .collect(Collectors.toList()), pageable, totalElements);

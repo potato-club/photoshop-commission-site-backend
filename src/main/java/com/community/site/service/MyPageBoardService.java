@@ -105,8 +105,7 @@ public class MyPageBoardService {
         long totalElements = boardRepository.countByUserAndQuestEnum(user, boardEnumCustom);
         Pageable pageable = PageRequest.of(page - 1, 16);
 
-        List<BoardList> boardLists = boardRepository.findByUserAndQuestEnum(user, boardEnumCustom);
-        Collections.reverse(boardLists);
+        List<BoardList> boardLists = boardRepository.findByUserAndQuestEnumOrderByIdDesc(user, boardEnumCustom);
 
         Page<ThumbnailResponseDto> pageList = new PageImpl<>(boardLists.stream().map(ThumbnailResponseDto::new)
                 .collect(Collectors.toList()), pageable, totalElements);
@@ -115,8 +114,7 @@ public class MyPageBoardService {
     }
 
     private List<ThumbnailResponseDto> myListBoardList(User user, BoardEnumCustom boardEnumCustom) {
-        List<BoardList> boardLists = boardRepository.findByUserAndQuestEnum(user, boardEnumCustom);
-        Collections.reverse(boardLists);
+        List<BoardList> boardLists = boardRepository.findByUserAndQuestEnumOrderByIdDesc(user, boardEnumCustom);
 
         return boardLists.stream().map(ThumbnailResponseDto::new).limit(8).collect(Collectors.toList());
     }
