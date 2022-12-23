@@ -205,6 +205,10 @@ public class BoardService {
             throw new UnAuthorizedException("NOT_FOUND_POST", ACCESS_DENIED_EXCEPTION);
         }
 
+        if (boardList.getQuestEnum().equals(COMPLETE)) {
+            throw new UnAuthorizedException("E0002", ACCESS_DENIED_EXCEPTION);
+        }
+
         boardListDto.setImageOpen(imageOpen);
         boardList.update(boardListDto);
 
