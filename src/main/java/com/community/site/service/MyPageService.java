@@ -71,8 +71,7 @@ public class MyPageService {
         long totalElements = boardRepository.countByUser(user);
         Pageable pageable = PageRequest.of(page - 1, 6);
 
-        List<BoardList> boardLists = boardRepository.findByUser(user);
-        Collections.reverse(boardLists);
+        List<BoardList> boardLists = boardRepository.findByUserOrderByIdDesc(user, pageable);
 
         Page<UserReviewResponseDto> pageList = new PageImpl<>(boardLists.stream().filter(i -> i.getQuestEnum()
                         .equals(REQUESTING)).map(UserReviewResponseDto::new)

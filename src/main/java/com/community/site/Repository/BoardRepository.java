@@ -19,7 +19,7 @@ public interface BoardRepository extends JpaRepository<BoardList, Long> {
     List<BoardList> findAllByQuestEnumOrderByIdDesc(BoardEnumCustom questEnum, Pageable pageable);
     List<BoardList> findByUserAndQuestEnumOrderByIdDesc(User user, BoardEnumCustom boardEnumCustom);
     List<BoardList> findByQuestEnumOrderByIdDesc(BoardEnumCustom questEnum);
-    List<BoardList> findByUser(User user);
+    List<BoardList> findByUserOrderByIdDesc(User user, Pageable pageable);
     List<BoardList> findBySelectedArtistOrderByIdDesc(User user, Pageable pageable);
     long countByQuestEnum(BoardEnumCustom questEnum);
     long countByNicknameContaining(String keyword);
