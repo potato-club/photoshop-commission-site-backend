@@ -60,6 +60,10 @@ public class MyPageService {
     public String averageGrade(HttpServletRequest request, HttpServletResponse response) {
         User user = returnUser(request, response);
 
+        if (user == null) {
+            return null;
+        }
+
         return String.format("%.1f", user.getGrade());
     }
 
@@ -210,9 +214,14 @@ public class MyPageService {
      */
     private User returnUser(HttpServletRequest request, HttpServletResponse response) {
         String token = tokenService.validateAndReissueToken(request, response);
-        String email = jwtTokenProvider.getUserEmail(token);
 
+        if (token.equals("guest")) {
+            return null;
+        }
+
+        String email = jwtTokenProvider.getUserEmail(token);
         User user = userRepository.findByEmail(email).orElseThrow();
+
         return user;
     }
 }
