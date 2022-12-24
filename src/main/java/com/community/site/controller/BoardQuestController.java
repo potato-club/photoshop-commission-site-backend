@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "localhost:3000")
+@CrossOrigin(origins = "https://easyphoto.site")
 @Api(tags = {"의뢰 Controller"})
 public class BoardQuestController {
     private final BoardQuestService boardQuestService;
