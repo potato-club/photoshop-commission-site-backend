@@ -174,8 +174,8 @@ public class MyPageService {
         }
 
         List<Review> averageGrade = reviewRepository.getByUser(boardList.getSelectedArtist());
-        Double averageSum = averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() / averageGrade.size() +
-                averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() % averageGrade.size();
+        Double averageSum = (averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() + requestDto.getGrade())
+                / (averageGrade.size() + 1);
 
         reviewRepository.save(requestDto.builder()
                 .roomId(requestDto.getRoomId())
@@ -188,7 +188,7 @@ public class MyPageService {
                 .build().toEntity());
 
         boardList.changeQuestEnum(COMPLETE);
-        user.updateAverageGrade(averageSum);
+        boardList.getSelectedArtist().updateAverageGrade(averageSum);
     }
 
     @Transactional  // 회원 탈퇴 기능
