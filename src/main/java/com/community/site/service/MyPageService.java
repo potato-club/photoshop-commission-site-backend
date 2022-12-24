@@ -173,14 +173,16 @@ public class MyPageService {
             throw new UnAuthorizedException("E0002", ErrorCode.ACCESS_DENIED_EXCEPTION);
         }
 
+        Double score = requestDto.getGrade() / 20;
+
         List<Review> averageGrade = reviewRepository.getByUser(boardList.getSelectedArtist());
-        Double averageSum = (averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() + requestDto.getGrade())
+        Double averageSum = (averageGrade.stream().mapToDouble(i -> i.getGrade()).sum() + score)
                 / (averageGrade.size() + 1);
 
         reviewRepository.save(requestDto.builder()
                 .roomId(requestDto.getRoomId())
                 .content(requestDto.getContent())
-                .grade(requestDto.getGrade())
+                .grade(score)
                 .nickname(user.getNickname())
                 .user(boardList.getSelectedArtist())
                 .boardList(boardList)
