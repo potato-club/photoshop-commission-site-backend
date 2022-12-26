@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserNicknameDto {
     private String nickname;
+    private Double grade;
 }

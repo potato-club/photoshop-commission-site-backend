@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,15 +83,20 @@ public class BoardQuestService {
     public Page<UserNicknameDto> getRequestUserList(Long id, int page, HttpServletRequest request,
                                                     HttpServletResponse response) {
         BoardList boardList = getBoardList(id);
-        List<UserNicknameDto> requestList;
+        List<UserNicknameDto> requestList = new ArrayList<>();
         User user = getUserByToken(request, response);
 
         if (!boardList.getUser().equals(user)) {
             throw new UnAuthorizedException("게시글 작성자만 가능합니다.", ACCESS_DENIED_EXCEPTION);
         }
 
-        requestList = boardList.getRequestList().stream()
-                .map(n -> UserNicknameDto.builder().nickname(n).build()).collect(Collectors.toList());
+        for (String nickname : boardList.getRequestList()) {
+            Double grade = userRepository.findByNickname(nickname).getGrade();
+            requestList.add(UserNicknameDto.builder()
+                            .nickname(nickname)
+                            .grade(Double.valueOf(String.format("%.1f", grade)))
+                            .build());
+        }
 
         return pagingList(page, requestList);
     }
@@ -103,8 +109,10 @@ public class BoardQuestService {
 
         if (!user.getUserRole().equals(ARTIST)) {
             throw new UnAuthorizedException("ARTIST 유저만 가능합니다", ACCESS_DENIED_EXCEPTION);
-        } else if(boardList.getRequestList().contains(user.getNickname())) {
+        } else if (boardList.getRequestList().contains(user.getNickname())) {
             throw new DuplicateException("이미 요청된 상태입니다.", CONFLICT_EXCEPTION);
+        } else if (user.getNickname().equals(boardList.getNickname())) {
+            throw new UnAuthorizedException("본인 글에 본인이 신청하는 것은 불가능합니다.", ACCESS_DENIED_EXCEPTION);
         }
 
         boardList.addAcceptQuest(user.getNickname());
