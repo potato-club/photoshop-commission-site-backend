@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://easyphoto.site")
 @Api(tags = {"마이페이지 내 게시글 Controller"})
 public class MyPageBoardController {
 

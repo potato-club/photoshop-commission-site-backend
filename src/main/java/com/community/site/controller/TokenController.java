@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://easyphoto.site")
 @Api(tags = {"토큰 검증 및 재발급 Controller"})
 public class TokenController {
 

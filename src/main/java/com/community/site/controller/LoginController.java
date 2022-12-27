@@ -23,7 +23,6 @@ import javax.servlet.http.HttpSession;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://easyphoto.site")
 @Api(tags = {"로그인 Controller"})
 public class LoginController {
 

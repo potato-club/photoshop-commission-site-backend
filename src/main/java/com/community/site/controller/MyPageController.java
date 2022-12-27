@@ -25,7 +25,6 @@ import java.lang.reflect.InvocationTargetException;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://easyphoto.site")
 @Api(tags = {"마이페이지 Controller"})
 public class MyPageController {
 

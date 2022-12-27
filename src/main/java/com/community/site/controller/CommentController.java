@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@CrossOrigin(origins = "https://easyphoto.site")
 @Api(tags = {"댓글 Controller"})
 public class CommentController {
 

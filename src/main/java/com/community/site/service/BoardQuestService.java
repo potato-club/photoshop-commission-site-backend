@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.community.site.enumcustom.UserRole.ARTIST;
-import static com.community.site.error.ErrorCode.ACCESS_DENIED_EXCEPTION;
-import static com.community.site.error.ErrorCode.CONFLICT_EXCEPTION;
+import static com.community.site.error.ErrorCode.*;
 
 
 @Slf4j
@@ -112,7 +111,7 @@ public class BoardQuestService {
         } else if (boardList.getRequestList().contains(user.getNickname())) {
             throw new DuplicateException("이미 요청된 상태입니다.", CONFLICT_EXCEPTION);
         } else if (user.getNickname().equals(boardList.getNickname())) {
-            throw new UnAuthorizedException("본인 글에 본인이 신청하는 것은 불가능합니다.", ACCESS_DENIED_EXCEPTION);
+            throw new UnAuthorizedException("본인 글에 본인이 신청하는 것은 불가능합니다.", NOT_ALLOW_WRITE_EXCEPTION);
         }
 
         boardList.addAcceptQuest(user.getNickname());

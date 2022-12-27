@@ -14,8 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://easyphoto.site")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("https://easyphoto.site", "http://localhost:3000")
                 .exposedHeaders("authorization", "refreshToken") // 'authorization', 'refreshToken' 헤더 값을 받아온다
                 .allowedHeaders("*")
                 .allowedMethods("*")
